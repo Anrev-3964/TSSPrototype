@@ -17,13 +17,13 @@ APlayerCharacter::APlayerCharacter()
 	{
 		PlayerCharacterSkeletalMesh->SetupAttachment(Capsule);
 
-		//Mesh's position relative to the capsule i called
+		//Mesh's position relative to the capsule I called
 		PlayerCharacterSkeletalMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f)); // Adjust to fit character model
 		PlayerCharacterSkeletalMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	}
 	
-	// Optional: Set a default skeletal mesh (ensure you have a mesh in your assets)
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT("SkeletalMesh'/Game/PathToYourMesh.YourMesh'"));
+	//Set a default skeletal mesh
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT("/Game/Models/SkeletalMeshes/PlayerCharacter/SK_PlayerCharacter.SK_PlayerCharacter"));
 	if (MeshAsset.Succeeded())
 	{
 		PlayerCharacterSkeletalMesh->SetSkeletalMesh(MeshAsset.Object);
