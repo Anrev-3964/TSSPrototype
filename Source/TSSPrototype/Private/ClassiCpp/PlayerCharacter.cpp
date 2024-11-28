@@ -4,8 +4,10 @@
 #include "ClassiCpp/PlayerCharacter.h"
 
 #include "NaniteSceneProxy.h"
+#include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
+#include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter() 
@@ -15,13 +17,20 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationYaw = true;
 	
 	
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
+	SpringArm->SetupAttachment(GetCapsuleComponent());
+	SpringArm->TargetArmLength = 500.0f; //how long I want this arm to be
+	SpringArm->bUsePawnControlRotation = true;
+	
+	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
+	PlayerCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	PlayerCamera->bUsePawnControlRotation = false;
+	
 	PlayerCharacterSkeletalMesh = GetMesh();
-	if (PlayerCharacterSkeletalMesh && Capsule)
+	if (PlayerCharacterSkeletalMesh)
 	{
-		PlayerCharacterSkeletalMesh->SetupAttachment(Capsule);
-
-		//Mesh's position relative to the capsule I called
-		PlayerCharacterSkeletalMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); // Adjust to fit character model
+		PlayerCharacterSkeletalMesh->SetupAttachment(GetCapsuleComponent()); // Attach mesh to capsule
+		PlayerCharacterSkeletalMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 		PlayerCharacterSkeletalMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	}
 	
@@ -65,11 +74,13 @@ void APlayerCharacter::MoveRight(float Value)
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 	FVector StartLocation = GetCapsuleComponent()->GetComponentLocation(); //Get the location of the capsule bound to the player character
 	float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	float TraceDistance = 100.0f; //The range of the downward raycast
 	FVector EndLocation = StartLocation - FVector(0.0f, 0.0f, CapsuleHalfHeight + TraceDistance);
 	FHitResult Hit;
+	
 	if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility))
 	{
 		FVector NewLocation = Hit.ImpactPoint + FVector(0, 0, CapsuleHalfHeight);

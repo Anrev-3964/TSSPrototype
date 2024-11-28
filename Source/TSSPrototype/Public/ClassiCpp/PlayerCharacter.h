@@ -24,8 +24,10 @@ private:
 	void MoveRight(float Value);
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PlayerCharacterSkeletalMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UCapsuleComponent* Capsule;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* SpringArm;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* PlayerCamera;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
