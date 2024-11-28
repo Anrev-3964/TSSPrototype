@@ -22,6 +22,8 @@ protected:
 private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void Turn();
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PlayerCharacterSkeletalMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))

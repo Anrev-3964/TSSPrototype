@@ -20,7 +20,8 @@ APlayerCharacter::APlayerCharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	SpringArm->TargetArmLength = 500.0f; //how long I want this arm to be
-	SpringArm->bUsePawnControlRotation = true;
+	SpringArm->bUsePawnControlRotation = false;
+	SpringArm->SetRelativeRotation(FRotator(70.0f, 0.0f, 0.0f));
 	
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
@@ -35,7 +36,7 @@ APlayerCharacter::APlayerCharacter()
 	}
 	
 	//Set a default skeletal mesh
-	if (PlayerCharacterSkeletalMesh == nullptr)
+	else if (PlayerCharacterSkeletalMesh == nullptr)
 	{
 		static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT("SkeletalMesh/Game/Models/SkeletalMeshes/PlayerCharacter/SK_PlayerCharacter"));
 		if (MeshAsset.Succeeded())
@@ -49,6 +50,13 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	APlayerController* PlayerController = Cast<APlayerController>(GetController()); 
+	
+	if (PlayerController)
+	{
+		PlayerController->bShowMouseCursor = true;
+		PlayerController->bEnableClickEvents = true;
+	} //enable cursor view
 	
 }
 
@@ -70,10 +78,49 @@ void APlayerCharacter::MoveRight(float Value)
 	}
 }
 
+void APlayerCharacter::Turn()
+{
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController && PlayerCharacterSkeletalMesh)
+	{
+		FVector2D ScreenLocation;
+		PlayerController->GetMousePosition(ScreenLocation.X, ScreenLocation.Y);
+
+		FVector WorldLocation, WorldDirection;
+		if (PlayerController->DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, WorldLocation, WorldDirection))
+		{
+			FVector TraceStart;
+			FVector TraceEnd = TraceStart + (WorldLocation * 10000.0f);
+			FHitResult HitTrace;
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(this);
+
+			if (GetWorld()->LineTraceSingleByChannel(HitTrace, TraceStart, TraceEnd,ECC_Visibility, Params))
+			{
+				FVector Impact = HitTrace.ImpactPoint;
+				FVector Direction = Impact - GetActorLocation();
+				Direction.Z = 0.0f;
+				FRotator NewActorRotation =Direction.Rotation();
+
+				PlayerCharacterSkeletalMesh->SetWorldRotation(NewActorRotation);
+			}
+		}
+	}
+	/*if (Controller != nullptr && Value != 0.0f)
+	{
+		
+		FRotator CurrentRotation = PlayerCharacterSkeletalMesh->GetRelativeRotation();
+		CurrentRotation.Yaw += Value; //Yaw added based on mouse input
+		PlayerCharacterSkeletalMesh->SetRelativeRotation(CurrentRotation);
+	}*/
+}
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	Turn();
 	
 	FVector StartLocation = GetCapsuleComponent()->GetComponentLocation(); //Get the location of the capsule bound to the player character
 	float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
