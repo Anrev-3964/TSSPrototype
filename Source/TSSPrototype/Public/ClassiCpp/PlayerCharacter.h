@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "PlayerCharacter.generated.h"
+
 
 UCLASS()
 class TSSPROTOTYPE_API APlayerCharacter : public ACharacter
@@ -32,11 +34,17 @@ private:
 	class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* PlayerCamera;
+
+	bool bIsMovingForward = false;
+	bool bIsMovingRight = false;
+	
 	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<APlayerGun> PlayerGun;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };
