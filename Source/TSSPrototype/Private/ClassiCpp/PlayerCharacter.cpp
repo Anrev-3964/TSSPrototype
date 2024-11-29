@@ -2,25 +2,23 @@
 
 
 #include "ClassiCpp/PlayerCharacter.h"
-
-#include "MaterialHLSLTree.h"
-#include "NaniteSceneProxy.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
 #include "GameFramework/SpringArmComponent.h"
-#include "Kismet/KismetMathLibrary.h"
-
 // Sets default values
 APlayerCharacter::APlayerCharacter() 
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = true;
-	
+
+	//this root component is used so my camera doesn't rotate with the capsule while pointing at the cursor
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	GetCapsuleComponent()->SetupAttachment(RootComponent);
 	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
-	SpringArm->SetupAttachment(GetCapsuleComponent());
+	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = 500.0f; //how long I want this arm to be
 	SpringArm->bUsePawnControlRotation = false;
 	SpringArm->SetRelativeRotation(FRotator(70.0f, 0.0f, 0.0f));
@@ -82,33 +80,27 @@ void APlayerCharacter::MoveRight(float Value)
 
 void APlayerCharacter::Turn()
 {
-	//note that the line 58-59 is seen pretty common on the internet to find the cursor porjection
-	//onto the internet, however, they do not give me the right vector.
-	//FVector CursorWorldLocation, CursorWorldDirection;
-	//GetWorld()->GetFirstPlayerController()->DeprojectMousePositionToWorld(CursorWorldLocation, CursorWorldDirection);
-	//=====================================================================//
 
 	//gets location of the actor in the world
-	FVector CurrLoc = PlayerCharacterSkeletalMesh->GetComponentLocation();
+	FVector CurrLoc = GetCapsuleComponent()->GetComponentLocation();
 
 	// the right method of getting cursor location!!! note: i used the exact same method in the Epic Top Down Blueprint.
-	FHitResult hitResult;
-	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true,hitResult);
-	FVector HitLoc = hitResult.Location;
+	FHitResult HitResult;
+	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true,HitResult);
+	FVector HitLoc = HitResult.Location;
 
 	//geting the original rotation of the acter;
-	FRotator NewRot = PlayerCharacterSkeletalMesh->GetComponentRotation();
+	FRotator NewRot = GetCapsuleComponent()->GetComponentRotation();
 	//Using atan2 function to get the degree between our character location and cursor location
 	// aka how much we want the character to rotate
 	FVector RayDirection = (HitLoc - CurrLoc).GetSafeNormal();
-	float newYaw = (RayDirection).Rotation().Yaw;
+	float NewYaw = (RayDirection).Rotation().Yaw;
 	//Using that degree as the Yaw(rotating around Z axis) of our Frotator
-	NewRot.Yaw = newYaw;
+	NewRot.Yaw = NewYaw;
 
 	//in the end, we set it;
-	PlayerCharacterSkeletalMesh->SetWorldRotation(NewRot);
-
-
+	//PlayerCharacterSkeletalMesh->SetWorldRotation(NewRot);
+	GetCapsuleComponent()->SetWorldRotation(NewRot);
 	
 		/*FVector TraceStart;
 			FVector TraceEnd = TraceStart + (WorldLocation * 10000.0f);
@@ -151,45 +143,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	Turn();
-
-	//APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	
-	/*if (PlayerController && GetCapsuleComponent())
-	{
-		FVector2D ScreenLocation;
-		PlayerController->GetMousePosition(ScreenLocation.X, ScreenLocation.Y);
-		
-		FVector CapsuleLocation = GetCapsuleComponent()->GetComponentLocation(); // Use CapsuleComponent location
-
-		// Deproject the mouse position to world space
-		FVector WorldLocation, WorldDirection;
-		if (PlayerController->DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, WorldLocation, WorldDirection))
-		{
-			// Keep the direction flat (we're working in a top-down view, so ignore the Z-axis)
-			WorldDirection.Z = 0;
-			WorldDirection.Normalize();
-
-			// Calculate the direction from the capsule to the mouse position in world space
-			FVector DirectionToMouse = WorldLocation - CapsuleLocation;
-			DirectionToMouse.Z = 0;  // Ensure we're working in a 2D plane (top-down view)
-			DirectionToMouse.Normalize();
-
-			// Get the current rotation of the capsule and the target rotation
-			FRotator TargetRotation = DirectionToMouse.Rotation();
-			FRotator CurrentRotation = GetCapsuleComponent()->GetComponentRotation();
-
-			// Smoothly interpolate the rotation
-			FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationSpeed);
-
-			// Apply the new rotation to the capsule component (this affects both the capsule and its attached mesh)
-			GetCapsuleComponent()->SetWorldRotation(NewRotation);
-
-			// Debugging: Draw the direction of the capsule's forward vector
-			FVector EndLocation = CapsuleLocation + (GetCapsuleComponent()->GetForwardVector() * 200.0f);
-			DrawDebugLine(GetWorld(), CapsuleLocation, EndLocation, FColor::Green, false, -1.0f, 0, 5.0f);
-		}
-	}*/
-	
 
 	//Code to attach the character to the ground
 	FVector StartLocation = GetCapsuleComponent()->GetComponentLocation(); //Get the location of the capsule bound to the player character

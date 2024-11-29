@@ -18,14 +18,12 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RotationSpeed")
-	float RotationSpeed = 20.0f;
+	void Turn();
 
 private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
-	void Turn();
+	
 	float InterpolateRotation(float CurrentAngle, float TargetAngle, float Speed, float DeltaTime);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
@@ -34,8 +32,6 @@ private:
 	class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* PlayerCamera;
-
-	
 	
 public:	
 	// Called every frame
