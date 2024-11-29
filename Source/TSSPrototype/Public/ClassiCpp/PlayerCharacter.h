@@ -25,6 +25,7 @@ protected:
 private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void FireWeapon();
 	
 	float InterpolateRotation(float CurrentAngle, float TargetAngle, float Speed, float DeltaTime);
 	
@@ -35,16 +36,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* PlayerCamera;
 
-	bool bIsMovingForward = false;
-	bool bIsMovingRight = false;
-	
-	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	TSubclassOf<APlayerGun> PlayerGun;
+	TSubclassOf<APlayerGun> PlayerGunClass;
+	APlayerGun* EquippedGun;
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

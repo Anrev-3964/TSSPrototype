@@ -49,6 +49,8 @@ APlayerCharacter::APlayerCharacter()
 			PlayerCharacterSkeletalMesh->SetSkeletalMesh(MeshAsset.Object);
 		}
 	}
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -66,22 +68,29 @@ void APlayerCharacter::BeginPlay()
 	if (PlayerCamera)
 	{
 		PlayerCamera->bUsePawnControlRotation = false;
-		
 	}
-	if (PlayerGun)
+	
+	if (PlayerGunClass)
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this; //the player is the owner of the weapon
 		SpawnParams.Instigator = GetInstigator();
-		APlayerGun* Gun = GetWorld()->SpawnActor<APlayerGun>(PlayerGun, FVector(GetCapsuleComponent()->GetRelativeLocation()),
-			FRotator(GetCapsuleComponent()->GetRelativeRotation()), SpawnParams);
-		if (Gun)
+		
+		EquippedGun = GetWorld()->SpawnActor<APlayerGun>(PlayerGunClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (EquippedGun)
 		{
-			Gun->AttachToComponent(PlayerCharacterSkeletalMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("PlayerHandSocket"));
+			EquippedGun->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+			UE_LOG(LogTemp, Warning, TEXT("WEAPON ASSIGNED"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO WEAPON ASSIGNED"));
 		}
 	}
-
-	
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NO GUN CLASS"));
+	}
 }
 
 void APlayerCharacter::MoveForward(float Value)
@@ -101,6 +110,16 @@ void APlayerCharacter::MoveRight(float Value)
 		AddMovementInput(GetActorRightVector(), Value);
 	}
 }
+
+void APlayerCharacter::FireWeapon()
+{
+	UE_LOG(LogTemp, Warning, TEXT("FireFromCharacter"));
+	if (EquippedGun)
+	{
+		EquippedGun->Fire();
+	}
+}
+
 
 void APlayerCharacter::Turn()
 {
@@ -173,4 +192,5 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::FireWeapon);
 }
