@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "BulletTypeStandard.h"
 #include "GameFramework/Actor.h"
+#include "Materials/MaterialInterface.h"
 #include "PlayerGun.generated.h"
 
 UCLASS()
@@ -44,6 +45,6 @@ public:
 	TSubclassOf<ABulletTypeStandard> BulletClass;
 	UPROPERTY(EditAnywhere, Category = "Bullets")
 	ABulletTypeStandard* BulletType;
-
+	
 	FTimerHandle FireTimer;
 };

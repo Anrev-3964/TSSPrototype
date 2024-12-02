@@ -23,10 +23,11 @@ ABulletTypeStandard::ABulletTypeStandard()
 	Mesh->SetGenerateOverlapEvents(true); //all this block of code ensures that the mesh doesn't respond to gravity,
 				//doesn't have physics and an active collider and that acts as a trigger when overlapping a pawn
 	Mesh->IgnoreActorWhenMoving(this, true); //This is done so the bullets don't get stuck on each other
+	
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	if (!ProjectileMovement) return;
 	Speed = ProjectileMovement->InitialSpeed = 2000.0f;
-	ProjectileMovement->MaxSpeed = 10000.0f;
+	ProjectileMovement->MaxSpeed = Speed;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
@@ -38,7 +39,7 @@ ABulletTypeStandard::ABulletTypeStandard()
 void ABulletTypeStandard::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	BulletElement(this);
 }
 
 // Called every frame
@@ -54,12 +55,20 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 	{
 	case EDamageType::STANDARD:
 		Tags.Add(FName("Standard"));
+		if (Materials.Num() > 0 && Materials[0])  // Check if the array has materials
+		{
+			Mesh->SetMaterial(0, Materials[0]);  // Apply material to slot 0
+		}
 		break;
 	case EDamageType::COLD:
 		{
 			Tags.Add(FName("Cold"));
 			float ColdDamage = Damage/2;
 			float ColdSpeed = Speed*3;
+			if (Materials.Num() > 0 && Materials[1])
+			{
+				Mesh->SetMaterial(0, Materials[1]);
+			}
 			SetDamage(ColdDamage);
 			SetSpeed(ColdSpeed);
 		}
@@ -69,6 +78,10 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 			Tags.Add(FName("Fire"));
 			float FireDamage = Damage*3;
 			float FireSpeed = Speed/2;
+			if (Materials.Num() > 0 && Materials[2])
+			{
+				Mesh->SetMaterial(0, Materials[2]);
+			}
 			SetDamage(FireDamage);
 			SetSpeed(FireSpeed);
 		}

@@ -58,7 +58,9 @@ public:
 	void SetSpeed(float NewSpeed);
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	void SetDamage(float NewDamage);
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", meta = (AllowPrivateAccess = "true"))
+	TArray<UMaterialInterface*> Materials;
+
 	void SetVelocity(const FVector& Velocity);
 	
 };
