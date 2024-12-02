@@ -1,9 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
+
+
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "ClassiCpp/WeaponClasses/BulletTypeStandard.h"
 #include "GameFramework/Actor.h"
+
 
 
 // Sets default values
@@ -11,7 +15,8 @@ APlayerGun::APlayerGun()
 {
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
-	
+	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
+	MuzzleLocation->SetupAttachment(RootComponent);
 	FireRate = 0.3f;
 	SpreadShotRange = 0.5f;
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -29,10 +34,10 @@ void APlayerGun::BeginPlay()
 void APlayerGun::Fire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire"));
-	if (!GetWorld()) return;
+	if (!GetWorld() || !BulletClass) return;
 
 	// Trace parameters
-	FVector Start = GetActorLocation(); // Start of the trace (e.g., gun muzzle)
+	FVector Start = MuzzleLocation->GetComponentLocation(); // Start of the trace (e.g., gun muzzle)
 	FVector ForwardVector = GetActorForwardVector(); // Direction the gun is pointing
 	//ForwardVector.X= FMath::RandRange(ForwardVector.X - 5, ForwardVector.X + 5);
 	ForwardVector.Y= FMath::RandRange(ForwardVector.Y - SpreadShotRange, ForwardVector.Y + SpreadShotRange);
@@ -55,6 +60,17 @@ void APlayerGun::Fire()
 	// Debug visualization
 	FColor LineColor = bHit ? FColor::Red : FColor::Purple;
 	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
+
+	
+	FRotator Rotator = GetActorRotation();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	BulletType = GetWorld()->SpawnActor<ABulletTypeStandard>(BulletClass, Start, Rotator, SpawnParams);
+	if (BulletType)
+	{
+		BulletType->SetVelocity(ForwardVector);
+	}
 }
 
 void APlayerGun::StartFiring()

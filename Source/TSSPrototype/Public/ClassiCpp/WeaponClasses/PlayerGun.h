@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BulletTypeStandard.h"
 #include "GameFramework/Actor.h"
 #include "PlayerGun.generated.h"
 
@@ -29,12 +30,20 @@ public:
 	void StartFiring();
 	void StopFiring();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* MeshComp;
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* MuzzleLocation;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
 	float FireRate;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
 	float SpreadShotRange;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Bullets", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ABulletTypeStandard> BulletClass;
+	UPROPERTY(EditAnywhere, Category = "Bullets")
+	ABulletTypeStandard* BulletType;
 
 	FTimerHandle FireTimer;
 };
