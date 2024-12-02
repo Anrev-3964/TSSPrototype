@@ -116,7 +116,15 @@ void APlayerCharacter::FireWeapon()
 	UE_LOG(LogTemp, Warning, TEXT("FireFromCharacter"));
 	if (EquippedGun)
 	{
-		EquippedGun->Fire();
+		EquippedGun->StartFiring();
+	}
+}
+
+void APlayerCharacter::StopWeapon()
+{
+	if (EquippedGun)
+	{
+		EquippedGun->StopFiring();
 	}
 }
 
@@ -193,4 +201,5 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::FireWeapon);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopWeapon);
 }

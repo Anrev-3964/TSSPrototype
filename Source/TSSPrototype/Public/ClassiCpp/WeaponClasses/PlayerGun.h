@@ -25,8 +25,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Fire();
+	
+	void StartFiring();
+	void StopFiring();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* MeshComp;
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float FireRate;
