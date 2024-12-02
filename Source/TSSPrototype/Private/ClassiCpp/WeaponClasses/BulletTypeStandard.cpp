@@ -9,18 +9,29 @@ ABulletTypeStandard::ABulletTypeStandard()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("BulletMesh");
+	if (!Mesh) return;
 	RootComponent = Mesh;
 	
-	Damage = 5.0f;
-	Speed = 2.0f;
-	
+	Mesh->SetEnableGravity(false);
+	Mesh->SetSimulatePhysics(false);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Mesh->SetCollisionObjectType(ECC_GameTraceChannel1);
+	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Mesh->SetGenerateOverlapEvents(true); //all this block of code ensures that the mesh doesn't respond to gravity,
+				//doesn't have physics and an active collider and that acts as a trigger when overlapping a pawn
+	Mesh->IgnoreActorWhenMoving(this, true); //This is done so the bullets don't get stuck on each other
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->InitialSpeed = 3000.0f;
-	ProjectileMovement->MaxSpeed;
+	if (!ProjectileMovement) return;
+	Speed = ProjectileMovement->InitialSpeed = 2000.0f;
+	ProjectileMovement->MaxSpeed = 10000.0f;
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
-	
+
+	Damage = 5.0f;
 }
 
 // Called when the game starts or when spawned
@@ -97,5 +108,15 @@ void ABulletTypeStandard::SetVelocity(const FVector& Velocity)
 	if (ProjectileMovement)
 	{
 		ProjectileMovement->Velocity = Velocity * Speed;
+	}
+}
+
+void ABulletTypeStandard::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this && !OtherActor->IsA(ABulletTypeStandard::StaticClass()))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
+		Destroy(); // Destroy or handle overlap appropriately
 	}
 }
