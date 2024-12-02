@@ -33,6 +33,8 @@ public:
 	UStaticMeshComponent* MeshComp;
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float FireRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	float SpreadShotRange;
 
 	FTimerHandle FireTimer;
 };

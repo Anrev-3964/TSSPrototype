@@ -13,6 +13,7 @@ APlayerGun::APlayerGun()
 	RootComponent = MeshComp;
 	
 	FireRate = 0.3f;
+	SpreadShotRange = 0.5f;
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -33,6 +34,8 @@ void APlayerGun::Fire()
 	// Trace parameters
 	FVector Start = GetActorLocation(); // Start of the trace (e.g., gun muzzle)
 	FVector ForwardVector = GetActorForwardVector(); // Direction the gun is pointing
+	//ForwardVector.X= FMath::RandRange(ForwardVector.X - 5, ForwardVector.X + 5);
+	ForwardVector.Y= FMath::RandRange(ForwardVector.Y - SpreadShotRange, ForwardVector.Y + SpreadShotRange);
 	FVector End = Start + (ForwardVector * 10000.0f); // End of the trace (10,000 units away)
 
 	FHitResult HitResult; // Store trace results
