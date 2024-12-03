@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BulletTypeStandard.h"
+#include "ClassiCpp/Utilities/DoOnce.h"
 #include "GameFramework/Actor.h"
 #include "Materials/MaterialInterface.h"
 #include "PlayerGun.generated.h"
@@ -20,6 +21,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+private:
+	float FireRate;
+	bool bHasFired;
 
 public:	
 	// Called every frame
@@ -39,7 +44,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
 	float SpreadShotRange;
-	float FireRate;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Bullets", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ABulletTypeStandard> BulletClass;
@@ -47,4 +51,5 @@ public:
 	ABulletTypeStandard* BulletType;
 	
 	FTimerHandle FireTimer;
+	FTimerHandle OpenFireTimer;
 };

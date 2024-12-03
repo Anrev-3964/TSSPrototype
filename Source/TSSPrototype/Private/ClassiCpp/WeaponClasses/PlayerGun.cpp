@@ -1,14 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
-
-
-#include "AsyncTreeDifferences.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "ClassiCpp/WeaponClasses/BulletTypeStandard.h"
 #include "GameFramework/Actor.h"
-
+#include "ClassiCpp/Utilities/DoOnce.h"
 
 
 // Sets default values
@@ -22,6 +19,7 @@ APlayerGun::APlayerGun()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	FireRate = 0.3f;
+	bHasFired = false;
 }
 
 
@@ -75,12 +73,25 @@ void APlayerGun::Fire()
 
 void APlayerGun::StartFiring()
 {
+	//FireOnce.Execute([](){&APlayerGun::Fire();}); //this doesn't work, try with another timer
+	
 	if (!BulletClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("BulletClass is not assigned!"));
 		GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, FireRate, true);
 		return;
 	}
+
+	if (!bHasFired)
+	{
+		Fire();
+		auto ResetFireFlagLambda = [this]() {
+			bHasFired = false;
+		};
+		
+		GetWorldTimerManager().SetTimer(OpenFireTimer, ResetFireFlagLambda, 3.0f, true);
+		bHasFired = true;
+	} //to fix
 	
 	BulletType = BulletClass->GetDefaultObject<ABulletTypeStandard>();
 	if (BulletType)
@@ -121,6 +132,8 @@ void APlayerGun::StartFiring()
 void APlayerGun::StopFiring()
 {
 	GetWorldTimerManager().ClearTimer(FireTimer);
+	GetWorldTimerManager().ClearTimer(OpenFireTimer);
+	//FireOnce.Reset();
 }
 
 
