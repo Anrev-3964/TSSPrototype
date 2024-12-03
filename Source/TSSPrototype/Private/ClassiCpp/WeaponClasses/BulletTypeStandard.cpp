@@ -33,6 +33,7 @@ ABulletTypeStandard::ABulletTypeStandard()
 	ProjectileMovement->bShouldBounce = false;
 
 	Damage = 5.0f;
+	FireRate = 0.3f;
 }
 
 // Called when the game starts or when spawned
@@ -65,12 +66,14 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 			Tags.Add(FName("Cold"));
 			float ColdDamage = Damage/2;
 			float ColdSpeed = Speed*3;
+			float ColdFireRate = FireRate*2;
 			if (Materials.Num() > 0 && Materials[1])
 			{
 				Mesh->SetMaterial(0, Materials[1]);
 			}
 			SetDamage(ColdDamage);
 			SetSpeed(ColdSpeed);
+			//SetFireRate(ColdFireRate);
 		}
 		break;
 	case EDamageType::FIRE:
@@ -78,12 +81,14 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 			Tags.Add(FName("Fire"));
 			float FireDamage = Damage*3;
 			float FireSpeed = Speed/2;
+			float FireFireRate = FireRate/2;
 			if (Materials.Num() > 0 && Materials[2])
 			{
 				Mesh->SetMaterial(0, Materials[2]);
 			}
 			SetDamage(FireDamage);
 			SetSpeed(FireSpeed);
+			//SetFireRate(FireFireRate);
 		}
 		break;
 	default:
@@ -101,6 +106,11 @@ float ABulletTypeStandard::GetSpeed() const
 	return Speed;
 }
 
+EDamageType ABulletTypeStandard::GetDamageType() const
+{
+	return DamageType;
+}
+
 void ABulletTypeStandard::SetDamage(float NewDamage)
 {
 	if (NewDamage >=0)
@@ -108,11 +118,20 @@ void ABulletTypeStandard::SetDamage(float NewDamage)
 		Damage = NewDamage;
 	}
 }
+
 void ABulletTypeStandard::SetSpeed(float NewSpeed)
 {
 	if (NewSpeed >=0)
 	{
 		Speed = NewSpeed;
+	}
+}
+
+void ABulletTypeStandard::SetDamageType(float NewFireRate)
+{
+	if (NewFireRate >=0)
+	{
+		FireRate = NewFireRate;
 	}
 }
 

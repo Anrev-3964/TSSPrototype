@@ -35,6 +35,9 @@ private:
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UProjectileMovementComponent* ProjectileMovement;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", meta = (AllowPrivateAccess = "true"))
+	TArray<UMaterialInterface*> Materials;
+
 	
 	void BulletElement(AActor* Bullet);
 	
@@ -42,7 +45,9 @@ private:
 	float Damage;
 	UPROPERTY(EditAnywhere, Category = "Properties", meta = (AllowPrivateAccess = "true"))
 	float Speed;
-
+	UPROPERTY(EditAnywhere, Category = "Properties", meta = (AllowPrivateAccess = "true"))
+	float FireRate;
+	
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -55,12 +60,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	float GetDamage() const;
 	UFUNCTION(BlueprintCallable, Category = "Properties")
+	EDamageType GetDamageType() const;
+	UFUNCTION(BlueprintCallable, Category = "Properties")
 	void SetSpeed(float NewSpeed);
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	void SetDamage(float NewDamage);
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", meta = (AllowPrivateAccess = "true"))
-	TArray<UMaterialInterface*> Materials;
-
+	UFUNCTION(BlueprintCallable, Category = "Properties")
+	void SetDamageType(float NewFireRate);
+	
 	void SetVelocity(const FVector& Velocity);
 	
 };

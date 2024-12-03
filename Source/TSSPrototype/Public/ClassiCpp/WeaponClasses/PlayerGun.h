@@ -36,10 +36,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* MuzzleLocation;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
-	float FireRate;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
 	float SpreadShotRange;
+	float FireRate;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Bullets", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ABulletTypeStandard> BulletClass;

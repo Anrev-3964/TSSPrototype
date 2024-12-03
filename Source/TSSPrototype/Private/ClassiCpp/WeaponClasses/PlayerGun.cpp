@@ -3,6 +3,7 @@
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 
 
+#include "AsyncTreeDifferences.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "ClassiCpp/WeaponClasses/BulletTypeStandard.h"
@@ -17,11 +18,10 @@ APlayerGun::APlayerGun()
 	RootComponent = MeshComp;
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->SetupAttachment(RootComponent);
-	FireRate = 0.3f;
 	SpreadShotRange = 0.15f;
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	FireRate = 0.3f;
 }
 
 
@@ -75,7 +75,47 @@ void APlayerGun::Fire()
 
 void APlayerGun::StartFiring()
 {
-	GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, FireRate, true);
+	if (!BulletClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BulletClass is not assigned!"));
+		GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, FireRate, true);
+		return;
+	}
+	
+	BulletType = BulletClass->GetDefaultObject<ABulletTypeStandard>();
+	if (BulletType)
+	{
+		float TempFireRate = FireRate;
+		switch (BulletType->GetDamageType())
+		{
+		case EDamageType::STANDARD:
+			{
+				GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
+			}
+			break;
+		case EDamageType::COLD:
+			{
+				TempFireRate /= 2;
+				GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
+			}
+			break;
+		case EDamageType::FIRE:
+			{
+				TempFireRate *= 2;
+				GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
+			}
+			break;
+			default:
+				{
+					UE_LOG(LogTemp, Warning, TEXT("UNKNOWN DAMAGE TYPE (HOW?)"));
+				}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NULLPTR FOR BULLET"));
+		GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, FireRate, true);
+	}
 }
 
 void APlayerGun::StopFiring()
