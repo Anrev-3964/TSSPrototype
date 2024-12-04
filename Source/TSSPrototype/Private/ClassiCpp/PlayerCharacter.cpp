@@ -21,8 +21,19 @@ APlayerCharacter::APlayerCharacter()
 	//this root component is used so my camera doesn't rotate with the capsule while pointing at the cursor
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent->Mobility = EComponentMobility::Movable;
-	GetCapsuleComponent()->SetupAttachment(RootComponent);
-	
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+	CapsuleComp->SetupAttachment(RootComponent);
+
+	if (CapsuleComp)
+	{
+		
+		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleComp->SetCollisionObjectType(ECC_Pawn);
+		CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+		CapsuleComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	}
 	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArm->SetupAttachment(RootComponent);
@@ -37,7 +48,7 @@ APlayerCharacter::APlayerCharacter()
 	PlayerCharacterSkeletalMesh = GetMesh();
 	if (PlayerCharacterSkeletalMesh)
 	{
-		PlayerCharacterSkeletalMesh->SetupAttachment(GetCapsuleComponent()); // Attach mesh to capsule
+		PlayerCharacterSkeletalMesh->SetupAttachment(CapsuleComp); // Attach mesh to capsule
 		PlayerCharacterSkeletalMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 		PlayerCharacterSkeletalMesh->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
 	}

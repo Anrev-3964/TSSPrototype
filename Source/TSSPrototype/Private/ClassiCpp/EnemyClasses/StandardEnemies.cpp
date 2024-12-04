@@ -13,8 +13,29 @@ AStandardEnemies::AStandardEnemies()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	GetCapsuleComponent()->SetupAttachment(RootComponent);
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	Capsule->SetupAttachment(RootComponent); //?
+
+	if (Capsule)
+	{
+		Capsule->SetGenerateOverlapEvents(true);
+		Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Capsule->SetCollisionObjectType(ECC_Pawn);
+		Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+		Capsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		Capsule->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+		Capsule->OnComponentBeginOverlap.AddDynamic(this, &AStandardEnemies::OnCapsuleBeginOverlap);
+		Capsule->OnComponentEndOverlap.AddDynamic(this, &AStandardEnemies::OnCapsuleEndOverlap);
+	}
+
+	GetMesh()->SetSimulatePhysics(false);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	Speed = 500.0f;
+	Health = 100.0f;
+
 }
 
 void AStandardEnemies::BeginPlay()
@@ -30,6 +51,28 @@ void AStandardEnemies::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	FollowPlayer();
 
+}
+
+void AStandardEnemies::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this) // Ensure it doesn't overlap itself
+	{
+		if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy collided with: %s"), *OtherActor->GetName());
+		// Custom logic for collision, e.g., damaging the player
+		}
+	}
+}
+
+void AStandardEnemies::OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Enemy stopped overlapping with: %s"), *OtherActor->GetName());
+	}
 }
 
 void AStandardEnemies::FollowPlayer()

@@ -127,12 +127,9 @@ void ABulletTypeStandard::SetSpeed(float NewSpeed)
 	}
 }
 
-void ABulletTypeStandard::SetDamageType(float NewFireRate)
+void ABulletTypeStandard::SetDamageType()
 {
-	if (NewFireRate >=0)
-	{
-		FireRate = NewFireRate;
-	}
+
 }
 
 void ABulletTypeStandard::SetVelocity(const FVector& Velocity)

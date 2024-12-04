@@ -66,7 +66,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	void SetDamage(float NewDamage);
 	UFUNCTION(BlueprintCallable, Category = "Properties")
-	void SetDamageType(float NewFireRate);
+	void SetDamageType();
 	
 	void SetVelocity(const FVector& Velocity);
 	
