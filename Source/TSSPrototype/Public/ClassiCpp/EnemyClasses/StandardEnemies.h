@@ -43,6 +43,7 @@ private:
 	
 
 	void FollowPlayer();
+	void GetPositionOutsideCamera();
 	
 public:	
 	// Called every frame

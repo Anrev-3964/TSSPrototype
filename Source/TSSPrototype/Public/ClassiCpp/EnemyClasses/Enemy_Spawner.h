@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
+#include "ClassiCpp/PlayerCharacter.h"
 #include "Enemy_Spawner.generated.h"
 
 UCLASS()
@@ -19,9 +20,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void SpawnLogic();
-	void Spawner();
 
+	UFUNCTION()
+	void SpawnLogic();
+	UFUNCTION()
+	void AttachToPlayer();
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Instance", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<ACharacter>> EnemyToSpawn;
@@ -35,6 +38,9 @@ private:
 	int MaxEnemies;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawn Instance", meta = (AllowPrivateAccess = "true"))
 	int SpawnedEnemies;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Properties", meta = (AllowPrivateAccess = "true"))
+	APlayerCharacter* PlayerCharacter;
 
 	FTimerHandle SpawnTimer;
 public:	
