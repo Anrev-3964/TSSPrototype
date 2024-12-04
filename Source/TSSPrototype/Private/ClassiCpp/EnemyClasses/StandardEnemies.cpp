@@ -36,6 +36,7 @@ AStandardEnemies::AStandardEnemies()
 	
 	Speed = 500.0f;
 	Health = 100.0f;
+	DamageDealt = 10.0f;
 
 }
 
@@ -51,7 +52,10 @@ void AStandardEnemies::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	FollowPlayer();
-
+	if (Health <= 0)
+	{
+		Destroy();
+	}
 }
 
 void AStandardEnemies::SetHealth(float DamageTaken)
@@ -59,6 +63,7 @@ void AStandardEnemies::SetHealth(float DamageTaken)
 	if (DamageTaken)
 	{
 		Health -= DamageTaken;
+		UE_LOG(LogTemp, Display, TEXT("New Health: %f"), Health);
 	}
 }
 
@@ -74,6 +79,9 @@ void AStandardEnemies::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp
 		if (OtherActor->IsA(ABulletTypeStandard::StaticClass()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Enemy collided with: %s"), *OtherActor->GetName());
+			ABulletTypeStandard* Bullet = Cast<ABulletTypeStandard>(OtherActor);
+			float DamageTaken = Bullet->GetDamage();
+			SetHealth(DamageTaken);
 		}
 	}
 }

@@ -118,7 +118,7 @@ void APlayerGun::StartFiring()
 			break;
 			default:
 				{
-					UE_LOG(LogTemp, Warning, TEXT("UNKNOWN DAMAGE TYPE (HOW?)"));
+					UE_LOG(LogTemp, Warning, TEXT("UNKNOWN DAMAGE TYPE"));
 				}
 		}
 	}
