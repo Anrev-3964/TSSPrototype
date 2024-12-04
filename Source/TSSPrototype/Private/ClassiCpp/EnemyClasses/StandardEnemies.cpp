@@ -23,6 +23,7 @@ AStandardEnemies::AStandardEnemies()
 		Capsule->SetCollisionObjectType(ECC_Pawn);
 		Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
 		Capsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+		Capsule->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		Capsule->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 
@@ -53,15 +54,26 @@ void AStandardEnemies::Tick(float DeltaTime)
 
 }
 
+void AStandardEnemies::SetHealth(float DamageTaken)
+{
+	if (DamageTaken)
+	{
+		Health -= DamageTaken;
+	}
+}
+
 void AStandardEnemies::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this) // Ensure it doesn't overlap itself
 	{
 		if (OtherActor->IsA(APlayerCharacter::StaticClass()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Enemy collided with: %s"), *OtherActor->GetName());
-		// Custom logic for collision, e.g., damaging the player
+		}
+		if (OtherActor->IsA(ABulletTypeStandard::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy collided with: %s"), *OtherActor->GetName());
 		}
 	}
 }
@@ -71,7 +83,10 @@ void AStandardEnemies::OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, 
 {
 	if (OtherActor && OtherActor != this)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Enemy stopped overlapping with: %s"), *OtherActor->GetName());
+		if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy stopped overlapping with: %s"), *OtherActor->GetName());
+		}
 	}
 }
 

@@ -45,5 +45,7 @@ private:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void SetHealth(float DamageTaken);
 	
 };

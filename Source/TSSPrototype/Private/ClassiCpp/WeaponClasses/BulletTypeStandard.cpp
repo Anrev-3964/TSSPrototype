@@ -2,6 +2,8 @@
 
 
 #include "ClassiCpp/WeaponClasses/BulletTypeStandard.h"
+
+#include "ClassiCpp/EnemyClasses/StandardEnemies.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
@@ -13,16 +15,20 @@ ABulletTypeStandard::ABulletTypeStandard()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("BulletMesh");
 	if (!Mesh) return;
 	RootComponent = Mesh;
-	
-	Mesh->SetEnableGravity(false);
-	Mesh->SetSimulatePhysics(false);
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Mesh->SetCollisionObjectType(ECC_GameTraceChannel1);
-	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	Mesh->SetGenerateOverlapEvents(true); //all this block of code ensures that the mesh doesn't respond to gravity,
-				//doesn't have physics and an active collider and that acts as a trigger when overlapping a pawn
-	Mesh->IgnoreActorWhenMoving(this, true); //This is done so the bullets don't get stuck on each other
+
+	if (Mesh)
+	{
+		Mesh->SetEnableGravity(false);
+		Mesh->SetSimulatePhysics(false);
+		Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		Mesh->SetCollisionObjectType(ECC_GameTraceChannel1);
+		Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+		Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		Mesh->SetGenerateOverlapEvents(true); //all this block of code ensures that the mesh doesn't respond to gravity,
+		//doesn't have physics and an active collider and that acts as a trigger when overlapping a pawn
+		Mesh->IgnoreActorWhenMoving(this, true); //This is done so the bullets don't get stuck on each other
+		Mesh->OnComponentBeginOverlap.AddDynamic(this, &ABulletTypeStandard::OnOverlapBegin);
+	}
 	
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	if (!ProjectileMovement) return;
@@ -143,9 +149,12 @@ void ABulletTypeStandard::SetVelocity(const FVector& Velocity)
 void ABulletTypeStandard::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != this && !OtherActor->IsA(ABulletTypeStandard::StaticClass()))
+	if (OtherActor && OtherActor != this)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
-		Destroy(); // Destroy or handle overlap appropriately
+		if (OtherActor->IsA(AStandardEnemies::StaticClass()))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
+			Destroy(); // Destroy or handle overlap appropriately
+		}
 	}
 }
