@@ -53,7 +53,7 @@ void AEnemy_AIController::SetupPerceptionSystem()
 
 void AEnemy_AIController::OnTargetDetected(AActor* Actor, FAIStimulus const Stimulus)
 {
-	if (auto* const Character = Cast<APlayerCharacter>(Actor))
+	if (auto* const ch = Cast<APlayerCharacter>(Actor))
 	{
 		GetBlackboardComponent()->SetValueAsBool("CanSeePlayerCharacter", Stimulus.WasSuccessfullySensed());
 	}

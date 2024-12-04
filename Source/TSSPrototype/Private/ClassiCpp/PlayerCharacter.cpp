@@ -9,6 +9,8 @@
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter() 
 {
@@ -50,6 +52,7 @@ APlayerCharacter::APlayerCharacter()
 		}
 	}
 
+	SetupStimulusSource();
 	
 }
 
@@ -162,6 +165,16 @@ float APlayerCharacter::InterpolateRotation(float CurrentAngle, float TargetAngl
 	float ClampedDeltaAngle = FMath::Clamp(DeltaAngle, -Step, Step);
 
 	return CurrentAngle + ClampedDeltaAngle;
+}
+
+void APlayerCharacter::SetupStimulusSource()
+{
+	StimulusSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus Source"));
+	if (StimulusSource)
+	{
+		StimulusSource->RegisterForSense(TSubclassOf<UAISense_Sight>());
+		StimulusSource->RegisterWithPerceptionSystem();
+	}
 }
 
 // Called every frame

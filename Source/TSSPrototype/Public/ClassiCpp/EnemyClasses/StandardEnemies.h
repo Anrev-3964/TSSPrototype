@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BehaviorTree.h"
 #include "GameFramework/Character.h"
 #include "ClassiCpp/PlayerCharacter.h"
 #include "StandardEnemies.generated.h"
@@ -29,13 +28,11 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float Speed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	UBehaviorTree* BehaviorTree;
+
+	void FollowPlayer();
 	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UBehaviorTree* GetBehaviorTree() const;
-
+	
 };
