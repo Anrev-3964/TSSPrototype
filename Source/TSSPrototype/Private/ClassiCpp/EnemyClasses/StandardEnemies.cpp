@@ -56,6 +56,7 @@ void AStandardEnemies::Tick(float DeltaTime)
 	FollowPlayer();
 	if (Health <= 0)
 	{
+		DropPickup();
 		Destroy();
 	}
 }
@@ -116,5 +117,20 @@ void AStandardEnemies::FollowPlayer()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player is not valid"));
+	}
+}
+
+void AStandardEnemies::DropPickup()
+{
+	if (Drops.Num() > 0)
+	{
+		int32 RandomIndex = FMath::RandRange(0, Drops.Num() - 1);
+		TSubclassOf<AActor> SelectedDrop = Drops[RandomIndex];
+
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+
+		GetWorld()->SpawnActor<AActor>(SelectedDrop, SpawnLocation, SpawnRotation);
+		UE_LOG(LogTemp, Log, TEXT("Dropped item: %s"), *SelectedDrop->GetName());
 	}
 }

@@ -38,7 +38,7 @@ ABulletTypeStandard::ABulletTypeStandard()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 
-	Damage = 5.0f;
+	Damage = 20.0f;
 	FireRate = 0.3f;
 }
 

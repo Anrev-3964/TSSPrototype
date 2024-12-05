@@ -5,7 +5,6 @@
 #include "TimerManager.h"
 #include "ClassiCpp/WeaponClasses/BulletTypeStandard.h"
 #include "GameFramework/Actor.h"
-#include "ClassiCpp/Utilities/DoOnce.h"
 
 
 // Sets default values

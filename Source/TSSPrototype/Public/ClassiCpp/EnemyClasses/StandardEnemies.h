@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ClassiCpp/PlayerCharacter.h"
-#include "PhysicsEngine/BodySetup.h"
+#include "ClassiCpp/Utilities/Enum_Elements.h"
 #include "StandardEnemies.generated.h"
 
 UCLASS()
@@ -33,6 +33,8 @@ private:
 	float Health;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float DamageDealt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drops", meta = (AllowPrivateAccess = "true"))
+	TArray<TSubclassOf<AActor>> Drops;
 
 	UFUNCTION()
 	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -43,6 +45,7 @@ private:
 	
 
 	void FollowPlayer();
+	void DropPickup();
 	
 public:	
 	// Called every frame

@@ -5,15 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "ClassiCpp/Utilities/Enum_Elements.h"
 #include "BulletTypeStandard.generated.h"
 
-UENUM(BlueprintType)
-enum class EDamageType : uint8
-{
-	STANDARD UMETA(DisplayName = "Standard Damage"),
-	FIRE UMETA(DisplayName = "Fire Damage"),
-	COLD UMETA(DisplayName = "Cold Damage"),
-};
 
 UCLASS()
 
