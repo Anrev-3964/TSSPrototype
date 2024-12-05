@@ -37,9 +37,20 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* PlayerCamera;
 
+	UPROPERTY(VisibleAnywhere, Category = "Bullet Class")
+	ABulletTypeStandard* BulletTypeStandard;
+
 	class UAIPerceptionStimuliSourceComponent* StimulusSource;
 
 	void SetupStimulusSource();
+
+	UFUNCTION()
+	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:	
 	// Called every frame

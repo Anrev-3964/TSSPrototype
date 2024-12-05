@@ -17,6 +17,7 @@ APlayerGun::APlayerGun()
 	SpreadShotRange = 0.15f;
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	BulletDamageType = EDamageType::STANDARD;
 	FireRate = 0.3f;
 	bHasFired = false;
 }
@@ -30,33 +31,35 @@ void APlayerGun::BeginPlay()
 
 void APlayerGun::Fire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire"));
 	if (!GetWorld() || !BulletClass) return;
 
-	// Trace parameters
-	FVector Start = MuzzleLocation->GetComponentLocation(); // Start of the trace (e.g., gun muzzle)
-	FVector ForwardVector = GetActorForwardVector(); // Direction the gun is pointing
-	//ForwardVector.X= FMath::RandRange(ForwardVector.X - 5, ForwardVector.X + 5);
-	ForwardVector.Y= FMath::RandRange(ForwardVector.Y - SpreadShotRange, ForwardVector.Y + SpreadShotRange);
-	FVector End = Start + (ForwardVector * 10000.0f); // End of the trace (10,000 units away)
+	
+		// Trace parameters
+		FVector Start = MuzzleLocation->GetComponentLocation(); // Start of the trace (e.g., gun muzzle)
+		FVector ForwardVector = GetActorForwardVector(); // Direction the gun is pointing
+	{
+		//ForwardVector.X= FMath::RandRange(ForwardVector.X - 5, ForwardVector.X + 5);
+		ForwardVector.Y= FMath::RandRange(ForwardVector.Y - SpreadShotRange, ForwardVector.Y + SpreadShotRange);
+		FVector End = Start + (ForwardVector * 10000.0f); // End of the trace (10,000 units away)
 
-	FHitResult HitResult; // Store trace results
-	FCollisionQueryParams TraceParams;
-	TraceParams.AddIgnoredActor(this); // Ignore the gun itself
-	TraceParams.AddIgnoredActor(GetOwner()); // Ignore the owning actor (e.g., player character)
+		FHitResult HitResult; // Store trace results
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(this); // Ignore the gun itself
+		TraceParams.AddIgnoredActor(GetOwner()); // Ignore the owning actor (e.g., player character)
 
-	// Perform the line trace
-	bool bHit = GetWorld()->LineTraceSingleByChannel(
-		HitResult,                   // Result of the trace
-		Start,                       // Start of the trace
-		End,                         // End of the trace
-		ECC_Visibility,              // Collision channel
-		TraceParams                  // Additional parameters
-	);
+		// Perform the line trace
+		bool bHit = GetWorld()->LineTraceSingleByChannel(
+			HitResult,                   // Result of the trace
+			Start,                       // Start of the trace
+			End,                         // End of the trace
+			ECC_Visibility,              // Collision channel
+			TraceParams                  // Additional parameters
+		);
 
-	// Debug visualization
-	FColor LineColor = bHit ? FColor::Red : FColor::Purple;
-	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
+		// Debug visualization
+		FColor LineColor = bHit ? FColor::Red : FColor::Purple;
+		DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
+	}
 
 	
 	FRotator Rotator = GetActorRotation();
@@ -66,7 +69,8 @@ void APlayerGun::Fire()
 	BulletType = GetWorld()->SpawnActor<ABulletTypeStandard>(BulletClass, Start, Rotator, SpawnParams);
 	if (BulletType)
 	{
-		BulletType->SetVelocity(ForwardVector);
+		BulletType->SetDamageType(BulletDamageType); // Update the bullet's type
+		BulletType->SetVelocity(ForwardVector);      // Set its velocity
 	}
 }
 
@@ -135,10 +139,16 @@ void APlayerGun::StopFiring()
 	//FireOnce.Reset();
 }
 
+void APlayerGun::SetBulletElement(EDamageType NewDamageType)
+{
+	BulletDamageType = NewDamageType;
+	UE_LOG(LogTemp, Error, TEXT("FUNCTION ACTIVE"));
+	
+}
+
 
 // Called every frame
 void APlayerGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }

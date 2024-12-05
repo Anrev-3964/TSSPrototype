@@ -22,8 +22,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
-	EDamageType DamageType {EDamageType::STANDARD};
+	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Mesh;
@@ -48,6 +47,8 @@ private:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
+	EDamageType DamageType {EDamageType::STANDARD};
 	
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	float GetSpeed() const;
@@ -60,7 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	void SetDamage(float NewDamage);
 	UFUNCTION(BlueprintCallable, Category = "Properties")
-	void SetDamageType();
+	void SetDamageType(EDamageType NewDamageType);
 	
 	void SetVelocity(const FVector& Velocity);
 	

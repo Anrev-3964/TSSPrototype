@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BulletTypeStandard.h"
-#include "ClassiCpp/Utilities/DoOnce.h"
+#include "ClassiCpp/Utilities/Enum_Elements.h"
 #include "GameFramework/Actor.h"
 #include "Materials/MaterialInterface.h"
 #include "PlayerGun.generated.h"
@@ -35,6 +35,7 @@ public:
 	
 	void StartFiring();
 	void StopFiring();
+	void SetBulletElement(EDamageType NewDamageType);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* MeshComp;
@@ -49,6 +50,9 @@ public:
 	TSubclassOf<ABulletTypeStandard> BulletClass;
 	UPROPERTY(EditAnywhere, Category = "Bullets")
 	ABulletTypeStandard* BulletType;
+	UPROPERTY(EditAnywhere, Category = "Bullets")
+	EDamageType BulletDamageType;
+	
 	
 	FTimerHandle FireTimer;
 	FTimerHandle OpenFireTimer;

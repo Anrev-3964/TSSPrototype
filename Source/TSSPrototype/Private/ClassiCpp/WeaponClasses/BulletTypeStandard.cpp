@@ -46,7 +46,7 @@ ABulletTypeStandard::ABulletTypeStandard()
 void ABulletTypeStandard::BeginPlay()
 {
 	Super::BeginPlay();
-	BulletElement(this);
+	
 }
 
 // Called every frame
@@ -133,9 +133,10 @@ void ABulletTypeStandard::SetSpeed(float NewSpeed)
 	}
 }
 
-void ABulletTypeStandard::SetDamageType()
+void ABulletTypeStandard::SetDamageType(EDamageType NewDamageType)
 {
-
+	DamageType = NewDamageType;
+	BulletElement(this);
 }
 
 void ABulletTypeStandard::SetVelocity(const FVector& Velocity)

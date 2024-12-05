@@ -23,8 +23,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", Meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Mesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", Meta = (AllowPrivateAccess = "true"))
-	EDamageType Element;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", meta = (AllowPrivateAccess = "true"))
 	TArray<UMaterialInterface*> Materials;
 
@@ -34,5 +33,11 @@ private:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", Meta = (AllowPrivateAccess = "true"))
+	EDamageType Element;
+
+	UFUNCTION()
+	void OnPickupOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 };

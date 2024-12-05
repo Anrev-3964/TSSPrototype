@@ -4,11 +4,13 @@
 #include "ClassiCpp/PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "ClassiCpp/EnemyClasses/Pickup.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 // Sets default values
@@ -26,13 +28,16 @@ APlayerCharacter::APlayerCharacter()
 
 	if (CapsuleComp)
 	{
+		CapsuleComp->SetGenerateOverlapEvents(true);
 		CapsuleComp->SetEnableGravity(false);
 		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		CapsuleComp->SetCollisionObjectType(ECC_Pawn);
 		CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		CapsuleComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
+		CapsuleComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
 		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+		CapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnCapsuleBeginOverlap);
 	}
 	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
@@ -95,11 +100,19 @@ void APlayerCharacter::BeginPlay()
 		{
 			EquippedGun->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 			UE_LOG(LogTemp, Warning, TEXT("WEAPON ASSIGNED"));
+			//BulletTypeStandard = EquippedGun->BulletType;
+			//UE_LOG(LogTemp, Error, TEXT("BulletTypeStandard: %s"), BulletTypeStandard ? TEXT("Valid") : TEXT("Null"));
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("NO WEAPON ASSIGNED"));
 		}
+
+		/*BulletTypeStandard = Cast<ABulletTypeStandard>(UGameplayStatics::GetActorOfClass(GetWorld(), ABulletTypeStandard::StaticClass()));
+		if (!BulletTypeStandard)
+		{
+			UE_LOG(LogTemp, Error, TEXT("BULLETTYPESTANDARD NOT FOUND"));
+		}*/
 	}
 	else
 	{
@@ -186,6 +199,42 @@ void APlayerCharacter::SetupStimulusSource()
 		StimulusSource->RegisterForSense(TSubclassOf<UAISense_Sight>());
 		StimulusSource->RegisterWithPerceptionSystem();
 	}
+}
+
+void APlayerCharacter::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Log, TEXT("OnCapsuleBeginOverlap called"));
+
+	if (OtherActor && OtherActor != this)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Overlapping actor: %s"), *OtherActor->GetName());
+
+		if (OtherActor->IsA(APickup::StaticClass()))
+		{
+			UE_LOG(LogTemp, Error, TEXT("COLLISION"));
+
+			APickup* PickupFound = Cast<APickup>(OtherActor);
+			if (PickupFound)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Pickup found with element: %d"), static_cast<int32>(PickupFound->Element));
+				EDamageType FoundDamageType = PickupFound->Element;
+				/*if (BulletTypeStandard)
+				{
+					
+					BulletTypeStandard->SetDamageType(FoundDamageType);
+					UE_LOG(LogTemp, Log, TEXT("Damage type set to: %d"), static_cast<int32>(FoundDamageType));
+				}*/
+				EquippedGun->SetBulletElement(FoundDamageType);
+				PickupFound->Destroy();
+			}
+		}
+	}
+}
+
+void APlayerCharacter::OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
 
 // Called every frame
