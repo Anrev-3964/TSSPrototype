@@ -3,6 +3,7 @@
 
 #include "ClassiCpp/EnemyClasses/Enemy_Spawner.h"
 
+#include "Camera/CameraComponent.h"
 #include "ClassiCpp/PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,7 +13,7 @@ AEnemy_Spawner::AEnemy_Spawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	SpawnRate = 1.0f;
+	SpawnRate = 10.0f;
 	SpawnCount = 10;
 	SpawnedEnemies = 0;
 	MaxEnemies = 100;
@@ -49,8 +50,7 @@ void AEnemy_Spawner::SpawnLogic()
 	int Index = 0;
 	if (EnemyToSpawn.Num() > 0 && EnemyToSpawn[Index])
 	{
-		FRotator Rotator = GetActorRotation();
-		FVector Location = GetActorLocation();
+		FRotator Rotator = FRotator::ZeroRotator;
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.Owner = this;
 		SpawnParameters.Instigator = GetInstigator();
@@ -58,6 +58,7 @@ void AEnemy_Spawner::SpawnLogic()
 		{
 			for (int i = 0; i < SpawnCount; i++)
 			{
+				FVector Location = GetPositionOutsideCamera();
 				ACharacter* SpawnedEnemy = GetWorld()->SpawnActor<ACharacter>(EnemyToSpawn[Index], Location, Rotator, SpawnParameters);
 				if (SpawnedEnemy)
 				{
@@ -68,6 +69,7 @@ void AEnemy_Spawner::SpawnLogic()
 		}
 		else
 		{
+			FVector Location = GetPositionOutsideCamera();
 			ACharacter* SpawnedEnemy = GetWorld()->SpawnActor<ACharacter>(EnemyToSpawn[Index], Location, Rotator, SpawnParameters);
 			if (SpawnedEnemy)
 			{
@@ -104,6 +106,42 @@ void AEnemy_Spawner::AttachToPlayer()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter is null."));
 	}
+}
+
+FVector AEnemy_Spawner::GetPositionOutsideCamera()
+{
+	if (!PlayerCharacter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter is null."));
+		return GetActorLocation(); //Sets the default location to the spawner location
+	}
+
+	UCameraComponent* PlayerCamera = PlayerCharacter->FindComponentByClass<UCameraComponent>();
+	if (!PlayerCamera)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CameraComponent is null."));
+		return GetActorLocation();
+	}
+
+	FVector CameraLocation = PlayerCamera->GetComponentLocation();
+	FVector CameraForward = PlayerCamera->GetForwardVector();
+	float SpawnRange = 2000.0f;
+
+	//randomize a direction outside the field of view
+	FVector RandomDirection = FMath::VRand();
+	RandomDirection.Z = 0.0f;
+	RandomDirection = RandomDirection.GetSafeNormal();
+	if (FVector::DotProduct(RandomDirection, CameraForward) > 0.5f)
+	{
+		RandomDirection *= -1.0f; // Flip the direction to ensure it is outside the camera's forward view
+	}
+
+	
+	// Adjust for the camera angle
+	FVector SpawnLoc = CameraLocation + (RandomDirection * SpawnRange);
+	// Ensure the spawn location is not below ground (adjust Z as needed for your game)
+	SpawnLoc.Z = PlayerCharacter->GetActorLocation().Z;
+	return SpawnLoc;
 }
 
 // Called every frame

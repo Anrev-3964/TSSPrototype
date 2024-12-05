@@ -26,11 +26,11 @@ APlayerCharacter::APlayerCharacter()
 
 	if (CapsuleComp)
 	{
-		
+		CapsuleComp->SetEnableGravity(false);
 		CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		CapsuleComp->SetCollisionObjectType(ECC_Pawn);
 		CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-		CapsuleComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
 		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	}

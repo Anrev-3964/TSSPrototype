@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "ClassiCpp/PlayerCharacter.h"
 #include "Enemy_Spawner.generated.h"
@@ -25,6 +26,7 @@ protected:
 	void SpawnLogic();
 	UFUNCTION()
 	void AttachToPlayer();
+	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Instance", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<ACharacter>> EnemyToSpawn;
@@ -42,7 +44,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Properties", meta = (AllowPrivateAccess = "true"))
 	APlayerCharacter* PlayerCharacter;
 
+	UFUNCTION()
+	FVector GetPositionOutsideCamera();
+
 	FTimerHandle SpawnTimer;
+	FTimerHandle SpawnDelayTimer;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

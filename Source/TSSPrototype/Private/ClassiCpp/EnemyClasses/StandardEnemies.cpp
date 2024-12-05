@@ -20,11 +20,12 @@ AStandardEnemies::AStandardEnemies()
 	{
 		Capsule->SetGenerateOverlapEvents(true);
 		Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		Capsule->SetCollisionObjectType(ECC_Pawn);
+		Capsule->SetCollisionObjectType(ECC_GameTraceChannel2);
 		Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
 		Capsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 		Capsule->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
-		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		Capsule->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
+		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 		Capsule->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 
 		Capsule->OnComponentBeginOverlap.AddDynamic(this, &AStandardEnemies::OnCapsuleBeginOverlap);
@@ -51,6 +52,7 @@ void AStandardEnemies::BeginPlay()
 void AStandardEnemies::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	this->SetActorRotation(FRotator(0,0,0));
 	FollowPlayer();
 	if (Health <= 0)
 	{
@@ -102,29 +104,17 @@ void AStandardEnemies::FollowPlayer()
 {
 	if (Player)
 	{
-		// Get the player's location
 		FVector PlayerLocation = Player->GetCapsuleComponent()->GetComponentLocation();
-        
-		// Get the enemy's current location
 		FVector EnemyLocation = GetActorLocation();
+		FVector Direction = (PlayerLocation - EnemyLocation).GetSafeNormal();
 
-		// Calculate the direction vector from the enemy to the player
-		FVector DirectionToPlayer = PlayerLocation - EnemyLocation;
+		FVector MovementDelta = Direction * Speed * GetWorld()->DeltaTimeSeconds;
 
-		// Normalize the direction vector to avoid moving too fast (scale to unit length)
-		DirectionToPlayer.Normalize();
-
-		// Move the enemy in the direction of the player
-		FVector MovementDelta = DirectionToPlayer * Speed * GetWorld()->DeltaTimeSeconds;
-
-		// Add movement towards the player
-		AddActorWorldOffset(MovementDelta); // This moves the actor smoothly
+		// Move the actor, respecting collision
+		AddActorWorldOffset(MovementDelta, true);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player is not valid"));
 	}
 }
-
-
-
