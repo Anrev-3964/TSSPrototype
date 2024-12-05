@@ -19,6 +19,7 @@ AStandardEnemies::AStandardEnemies()
 	if (Capsule)
 	{
 		Capsule->SetGenerateOverlapEvents(true);
+		Capsule->SetNotifyRigidBodyCollision(true);
 		Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		Capsule->SetCollisionObjectType(ECC_GameTraceChannel2);
 		Capsule->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -30,6 +31,7 @@ AStandardEnemies::AStandardEnemies()
 
 		Capsule->OnComponentBeginOverlap.AddDynamic(this, &AStandardEnemies::OnCapsuleBeginOverlap);
 		Capsule->OnComponentEndOverlap.AddDynamic(this, &AStandardEnemies::OnCapsuleEndOverlap);
+		Capsule->OnComponentHit.AddDynamic(this, &AStandardEnemies::OnHit);
 	}
 
 	GetMesh()->SetSimulatePhysics(false);
@@ -75,10 +77,7 @@ void AStandardEnemies::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp
 {
 	if (OtherActor && OtherActor != this) // Ensure it doesn't overlap itself
 	{
-		if (OtherActor->IsA(APlayerCharacter::StaticClass()))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Enemy collided with: %s"), *OtherActor->GetName());
-		}
+		
 		if (OtherActor->IsA(ABulletTypeStandard::StaticClass()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Enemy collided with: %s"), *OtherActor->GetName());
@@ -100,6 +99,25 @@ void AStandardEnemies::OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, 
 		}
 	}
 }
+
+void AStandardEnemies::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor->IsA(APlayerCharacter::StaticClass()) && bCanDealDamage)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Enemy COLLIDED with: %s"), *OtherActor->GetName());
+
+		APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
+		if (PlayerCharacter)
+		{
+			PlayerCharacter->SetHealth(DamageDealt);
+			bCanDealDamage = false; // Disable damage until cooldown is finished
+
+			// Set a timer to re-enable damage after the cooldown
+			GetWorld()->GetTimerManager().SetTimer(DamageCooldownTimerHandle, this, &AStandardEnemies::EnableDamage, DamageCooldown, false);
+		}
+	}
+} //Problem: on multiple enemies the damage is applied multiple times
 
 void AStandardEnemies::FollowPlayer()
 {
@@ -134,3 +152,10 @@ void AStandardEnemies::DropPickup()
 		UE_LOG(LogTemp, Log, TEXT("Dropped item: %s"), *SelectedDrop->GetName());
 	}
 }
+
+void AStandardEnemies::EnableDamage()
+{
+	bCanDealDamage = true;
+}
+
+

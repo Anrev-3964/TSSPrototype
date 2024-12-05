@@ -3,8 +3,10 @@
 
 #include "ClassiCpp/PlayerCharacter.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "ClassiCpp/EnemyClasses/Pickup.h"
+#include "ClassiCpp/EnemyClasses/StandardEnemies.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
@@ -69,6 +71,8 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	SetupStimulusSource();
+
+	Health = 100.0f;
 	
 }
 
@@ -155,6 +159,25 @@ void APlayerCharacter::StopWeapon()
 	}
 }
 
+void APlayerCharacter::HealthCheck()
+{
+	if (Health <= 0)
+	{
+		// Pause the game and show the Game Over screen
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+		// Create and show the Game Over widget
+		if (GameOverWidgetClass)
+		{
+			UUserWidget* GameOverWidget = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
+			if (GameOverWidget)
+			{
+				GameOverWidget->AddToViewport();
+			}
+		}
+	}
+}
+
 
 void APlayerCharacter::Turn()
 {
@@ -219,16 +242,22 @@ void APlayerCharacter::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp
 			{
 				UE_LOG(LogTemp, Log, TEXT("Pickup found with element: %d"), static_cast<int32>(PickupFound->Element));
 				EDamageType FoundDamageType = PickupFound->Element;
-				/*if (BulletTypeStandard)
-				{
-					
-					BulletTypeStandard->SetDamageType(FoundDamageType);
-					UE_LOG(LogTemp, Log, TEXT("Damage type set to: %d"), static_cast<int32>(FoundDamageType));
-				}*/
 				EquippedGun->SetBulletElement(FoundDamageType);
 				PickupFound->Destroy();
 			}
 		}
+
+		/*if (OtherActor->IsA(AStandardEnemies::StaticClass()))
+		{
+			AStandardEnemies* Enemy = Cast<AStandardEnemies>(OtherActor);
+			if (Enemy)
+			{
+				float Damage = Enemy->GetDamageDealt();
+				Health -= Damage;
+				UE_LOG(LogTemp, Error, TEXT("DAMAGE: %f"), Health);
+			}
+			UE_LOG(LogTemp, Error, TEXT("DAMAGE: %f"), Health);
+		}*/
 	}
 }
 
@@ -247,7 +276,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	SpringArm->SetRelativeLocation(FVector(CapsuleX, CapsuleY, SpringArm->GetRelativeLocation().Z)); //Now the SpringArm follows the capsule
 	
 	Turn();
-
 	
 	if (!GetCharacterMovement()->IsMovingOnGround()) //This script normally interferes with friction, so it's only called when the character is not touching ground
 	{
@@ -275,4 +303,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::MoveRight);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::FireWeapon);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopWeapon);
+}
+
+void APlayerCharacter::SetHealth(float DamageTaken)
+{
+	Health -= DamageTaken;
+	UE_LOG(LogTemp, Error, TEXT("Health: %f"), Health);
 }

@@ -42,10 +42,19 @@ private:
 	UFUNCTION()
 	void OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	bool bCanDealDamage = true;  // Flag to track if damage can be applied
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
+	float DamageCooldown = 2.0f; // Time in seconds between damage applications
+	
 	void FollowPlayer();
 	void DropPickup();
+	void EnableDamage();
+
+	FTimerHandle DamageCooldownTimerHandle;
 	
 public:	
 	// Called every frame

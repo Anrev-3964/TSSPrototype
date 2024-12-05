@@ -27,6 +27,7 @@ private:
 	void MoveRight(float Value);
 	void FireWeapon();
 	void StopWeapon();
+	void HealthCheck();
 	
 	float InterpolateRotation(float CurrentAngle, float TargetAngle, float Speed, float DeltaTime);
 	
@@ -39,6 +40,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Bullet Class")
 	ABulletTypeStandard* BulletTypeStandard;
+	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
+	float Health;
 
 	class UAIPerceptionStimuliSourceComponent* StimulusSource;
 
@@ -59,7 +64,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TSubclassOf<APlayerGun> PlayerGunClass;
 	APlayerGun* EquippedGun;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> GameOverWidgetClass;
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void SetHealth(float DamageTaken);
 };
