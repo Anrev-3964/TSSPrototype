@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
+#include "ClassiCpp/UI/Widget_GameOver.h"
 #include "PlayerCharacter.generated.h"
 
 
@@ -48,6 +49,9 @@ private:
 	class UAIPerceptionStimuliSourceComponent* StimulusSource;
 
 	void SetupStimulusSource();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UWidget_GameOver* GameOverWidget;
 
 	UFUNCTION()
 	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,

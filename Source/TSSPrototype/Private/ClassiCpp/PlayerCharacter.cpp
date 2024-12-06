@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "ClassiCpp/EnemyClasses/Pickup.h"
 #include "ClassiCpp/EnemyClasses/StandardEnemies.h"
+#include "ClassiCpp/UI/Widget_GameOver.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
@@ -104,19 +105,11 @@ void APlayerCharacter::BeginPlay()
 		{
 			EquippedGun->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 			UE_LOG(LogTemp, Warning, TEXT("WEAPON ASSIGNED"));
-			//BulletTypeStandard = EquippedGun->BulletType;
-			//UE_LOG(LogTemp, Error, TEXT("BulletTypeStandard: %s"), BulletTypeStandard ? TEXT("Valid") : TEXT("Null"));
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("NO WEAPON ASSIGNED"));
 		}
-
-		/*BulletTypeStandard = Cast<ABulletTypeStandard>(UGameplayStatics::GetActorOfClass(GetWorld(), ABulletTypeStandard::StaticClass()));
-		if (!BulletTypeStandard)
-		{
-			UE_LOG(LogTemp, Error, TEXT("BULLETTYPESTANDARD NOT FOUND"));
-		}*/
 	}
 	else
 	{
@@ -161,7 +154,7 @@ void APlayerCharacter::StopWeapon()
 
 void APlayerCharacter::HealthCheck()
 {
-	if (Health <= 0)
+	/*if (Health <= 0)
 	{
 		// Pause the game and show the Game Over screen
 		UGameplayStatics::SetGamePaused(GetWorld(), true);
@@ -175,7 +168,7 @@ void APlayerCharacter::HealthCheck()
 				GameOverWidget->AddToViewport();
 			}
 		}
-	}
+	}*/
 }
 
 
@@ -246,18 +239,6 @@ void APlayerCharacter::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp
 				PickupFound->Destroy();
 			}
 		}
-
-		/*if (OtherActor->IsA(AStandardEnemies::StaticClass()))
-		{
-			AStandardEnemies* Enemy = Cast<AStandardEnemies>(OtherActor);
-			if (Enemy)
-			{
-				float Damage = Enemy->GetDamageDealt();
-				Health -= Damage;
-				UE_LOG(LogTemp, Error, TEXT("DAMAGE: %f"), Health);
-			}
-			UE_LOG(LogTemp, Error, TEXT("DAMAGE: %f"), Health);
-		}*/
 	}
 }
 
@@ -308,5 +289,29 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void APlayerCharacter::SetHealth(float DamageTaken)
 {
 	Health -= DamageTaken;
-	UE_LOG(LogTemp, Error, TEXT("Health: %f"), Health);
+	if (Health <= 0 && !GameOverWidget)  // Ensure it triggers only once
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		if (PlayerController && !GameOverWidget)
+		{
+			// Create and add the widget to the viewport
+			GameOverWidget = CreateWidget<UWidget_GameOver>(PlayerController, GameOverWidgetClass);
+			if (GameOverWidget)
+			{
+				GameOverWidget->AddToViewport();
+
+				// Pause the game
+				UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+				// Show mouse cursor for the widget
+				PlayerController->bShowMouseCursor = true;
+				PlayerController->SetInputMode(FInputModeUIOnly());
+				UE_LOG(LogTemp, Error, TEXT("ENTERED THIRD IF"));
+				
+			}
+			UE_LOG(LogTemp, Error, TEXT("ENTERED SECOND IF"));
+		}
+		UE_LOG(LogTemp, Error, TEXT("ENTERED FIRST IF"));
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
 }

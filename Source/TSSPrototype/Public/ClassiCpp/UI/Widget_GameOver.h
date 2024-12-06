@@ -15,11 +15,19 @@ class TSSPROTOTYPE_API UWidget_GameOver : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	
+protected:
+	// Override NativeConstruct to initialize the widget
+	virtual void NativeConstruct() override;
+
 	UFUNCTION(BlueprintCallable, Category = "GameOver")
 	void RestartGame();
 	UFUNCTION(BlueprintCallable, Category = "GameOver")
 	void QuitGame();
-protected:
-	// Override NativeConstruct to initialize the widget
-	virtual void NativeConstruct() override;
+	
+	// Reference to buttons (set in the Blueprint)
+	UPROPERTY(meta = (BindWidget))
+	class UButton* RestartButton;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* QuitButton;
 };
