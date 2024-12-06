@@ -222,7 +222,7 @@ void APlayerCharacter::SetupStimulusSource()
 void APlayerCharacter::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Log, TEXT("OnCapsuleBeginOverlap called"));
+	/*UE_LOG(LogTemp, Log, TEXT("OnCapsuleBeginOverlap called"));
 
 	if (OtherActor && OtherActor != this)
 	{
@@ -241,7 +241,7 @@ void APlayerCharacter::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp
 				PickupFound->Destroy();
 			}
 		}
-	}
+	}*/
 }
 
 void APlayerCharacter::OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -276,6 +276,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 }
+
+/*APlayerGun APlayerCharacter::GetGun()
+{
+	return EquippedGun;
+}*/
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -322,4 +327,6 @@ void APlayerCharacter::SetHealth(float DamageTaken)
 		UE_LOG(LogTemp, Error, TEXT("ENTERED FIRST IF"));
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
+
+	//move UI logic to the player controller
 }

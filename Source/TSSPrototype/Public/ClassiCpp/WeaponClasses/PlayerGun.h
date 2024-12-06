@@ -26,7 +26,7 @@ private:
 	float TempFireRate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float FireRate;
-	bool bHasFired;
+	bool bCanFire;
 
 public:	
 	// Called every frame
@@ -34,7 +34,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Fire();
-	
+
+	void ResetFireBoolCooldown();
 	void StartFiring();
 	void StopFiring();
 	void SetBulletElement(EDamageType NewDamageType);

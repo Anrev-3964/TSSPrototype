@@ -28,12 +28,12 @@ void APickup::BeginPlay()
 	switch (Index)
 	{
 	case 0:
-		Element = EDamageType::COLD;
-		Tags.Add(FName("Cold"));
-		break;
-	case 1:
 		Element = EDamageType::FIRE;
 		Tags.Add(FName("Fire"));
+		break;
+	case 1:
+		Element = EDamageType::COLD;
+		Tags.Add(FName("Cold"));
 		break;
 	default:
 		Element = EDamageType::STANDARD; // Default or fallback value
@@ -71,25 +71,15 @@ void APickup::Tick(float DeltaTime)
 void APickup::OnPickupOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	/*if (OtherActor && OtherActor->IsA(APlayerCharacter::StaticClass()))
+	if (OtherActor && OtherActor != this)
 	{
-		// Cast the overlapping actor to the player character
-		APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
-
-		if (Player && Player->EquippedGun)
+		APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
+		if (PlayerCharacter)
 		{
-			// Directly modify the gun's elemental type
-			Player->EquippedGun->SetBulletElement(Element);
-			UE_LOG(LogTemp, Log, TEXT("Elemental type changed to %d"), static_cast<int32>(Element));
-
-			// Destroy the pickup after it's used
-			Destroy();
+			PlayerCharacter->EquippedGun->SetBulletElement(Element);
+			this->Destroy();
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Player or PlayerGun is null!"));
-		}
-	}*/
+	}
 }
 
 

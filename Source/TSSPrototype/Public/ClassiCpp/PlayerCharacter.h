@@ -77,6 +77,8 @@ public:
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	APlayerGun GetGun();
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

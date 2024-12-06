@@ -18,8 +18,8 @@ APlayerGun::APlayerGun()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	BulletDamageType = EDamageType::STANDARD;
-	FireRate = 0.3f;
-	bHasFired = false;
+	FireRate = 0.2f;
+	bCanFire = true;
 }
 
 
@@ -33,12 +33,17 @@ void APlayerGun::BeginPlay()
 
 void APlayerGun::Fire()
 {
-	if (!GetWorld() || !BulletClass) return;
+	
+	if (!bCanFire || !GetWorld() || !BulletClass)
+	{
+		return; // Do nothing if cooldown is active or prerequisites are not met
+	}
+	
 
 	
 		// Trace parameters
-		FVector Start = MuzzleLocation->GetComponentLocation(); // Start of the trace (e.g., gun muzzle)
-		FVector ForwardVector = GetActorForwardVector(); // Direction the gun is pointing
+	FVector Start = MuzzleLocation->GetComponentLocation(); // Start of the trace (e.g., gun muzzle)
+	FVector ForwardVector = GetActorForwardVector(); // Direction the gun is pointing
 	{
 		//ForwardVector.X= FMath::RandRange(ForwardVector.X - 5, ForwardVector.X + 5);
 		ForwardVector.Y= FMath::RandRange(ForwardVector.Y - SpreadShotRange, ForwardVector.Y + SpreadShotRange);
@@ -74,35 +79,26 @@ void APlayerGun::Fire()
 		BulletType->SetDamageType(BulletDamageType); // Update the bullet's type
 		BulletType->SetVelocity(ForwardVector);      // Set its velocity
 	}
+	
+	// Set cooldown
+	/*bCanFire = false;
+	GetWorldTimerManager().SetTimer(OpenFireTimer, this, &APlayerGun::ResetFireBoolCooldown, TempFireRate, false);*/
+}
+
+void APlayerGun::ResetFireBoolCooldown()
+{
+	bCanFire = true;
 }
 
 void APlayerGun::StartFiring()
 {
-	//FireOnce.Execute([](){&APlayerGun::Fire();}); //this doesn't work, try with another timer
-	
 	if (!BulletClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("BulletClass is not assigned!"));
-		GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, FireRate, true);
 		return;
 	}
-
-	if (!bHasFired)
-	{
-		Fire();
-		auto ResetFireFlagLambda = [this]() {
-			bHasFired = false;
-		};
-		
-		GetWorldTimerManager().SetTimer(OpenFireTimer, ResetFireFlagLambda, 3.0f, true);
-		bHasFired = true;
-	} //to fix
 	
-	//BulletType = BulletClass->GetDefaultObject<ABulletTypeStandard>();
-	//if (BulletType)
-	//{
-		
-		switch (BulletDamageType)
+	switch (BulletDamageType)
 		{
 		case EDamageType::STANDARD:
 			{
@@ -122,29 +118,36 @@ void APlayerGun::StartFiring()
 				GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 			}
 			break;
-			default:
-				{
-					UE_LOG(LogTemp, Warning, TEXT("UNKNOWN DAMAGE TYPE"));
-				}
+		default:
+			{
+				UE_LOG(LogTemp, Warning, TEXT("UNKNOWN DAMAGE TYPE"));
+			}
 		}
-	//}
-	/*else
+
+	// Fire the first bullet immediately if allowed
+	/*if (bCanFire)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NULLPTR FOR BULLET"));
-		GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, FireRate, true);
+		Fire();
+	}
+	// Start periodic firing
+	if (!GetWorldTimerManager().IsTimerActive(FireTimer))
+	{
+		GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 	}*/
+	
 }
 
 void APlayerGun::StopFiring()
 {
 	GetWorldTimerManager().ClearTimer(FireTimer);
-	GetWorldTimerManager().ClearTimer(OpenFireTimer);
-	//FireOnce.Reset();
+	/*GetWorldTimerManager().ClearTimer(OpenFireTimer);
+	bCanFire = true;*/
 }
 
 void APlayerGun::SetBulletElement(EDamageType NewDamageType)
 {
 	BulletDamageType = NewDamageType;
+	StopFiring();
 	StartFiring(); //this makes the Fire Rate change instantly when a new element is taken
 	UE_LOG(LogTemp, Error, TEXT("FUNCTION ACTIVE"));
 	
