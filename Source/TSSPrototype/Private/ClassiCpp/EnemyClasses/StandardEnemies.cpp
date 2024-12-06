@@ -140,16 +140,22 @@ void AStandardEnemies::FollowPlayer()
 
 void AStandardEnemies::DropPickup()
 {
-	if (Drops.Num() > 0)
+	float DropChance = 25.0f;
+	float DropValue = FMath::RandRange(0.0f, 100.0f); //simulating a percentage of dropping an item
+	
+	if (DropChance >= DropValue)
 	{
-		int32 RandomIndex = FMath::RandRange(0, Drops.Num() - 1);
-		TSubclassOf<AActor> SelectedDrop = Drops[RandomIndex];
+		if (Drops.Num() > 0)
+		{
+			int32 RandomIndex = FMath::RandRange(0, Drops.Num() - 1);
+			TSubclassOf<AActor> SelectedDrop = Drops[RandomIndex];
 
-		FVector SpawnLocation = GetActorLocation();
-		FRotator SpawnRotation = FRotator::ZeroRotator;
+			FVector SpawnLocation = GetActorLocation(); 
+			FRotator SpawnRotation = FRotator::ZeroRotator;
 
-		GetWorld()->SpawnActor<AActor>(SelectedDrop, SpawnLocation, SpawnRotation);
-		UE_LOG(LogTemp, Log, TEXT("Dropped item: %s"), *SelectedDrop->GetName());
+			GetWorld()->SpawnActor<AActor>(SelectedDrop, SpawnLocation, SpawnRotation); //spawns the drop at the enemy location
+			UE_LOG(LogTemp, Log, TEXT("Dropped item: %s"), *SelectedDrop->GetName());
+		} //drop logic
 	}
 }
 
