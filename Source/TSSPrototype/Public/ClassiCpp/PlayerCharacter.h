@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "ClassiCpp/UI/Widget_GameOver.h"
+#include "UI/Widget_HealthBar.h"
 #include "PlayerCharacter.generated.h"
 
 
@@ -44,7 +45,10 @@ private:
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
-	float Health;
+	float MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
+	float CurrentHealth;
+	
 
 	class UAIPerceptionStimuliSourceComponent* StimulusSource;
 
@@ -52,6 +56,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidget_GameOver* GameOverWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UWidget_HealthBar* HealthBarWidget;
 
 	UFUNCTION()
 	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -70,6 +76,8 @@ public:
 	APlayerGun* EquippedGun;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

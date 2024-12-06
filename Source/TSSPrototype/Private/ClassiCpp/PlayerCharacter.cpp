@@ -8,6 +8,7 @@
 #include "ClassiCpp/EnemyClasses/Pickup.h"
 #include "ClassiCpp/EnemyClasses/StandardEnemies.h"
 #include "ClassiCpp/UI/Widget_GameOver.h"
+#include "ClassiCpp/UI/Widget_HealthBar.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
@@ -73,7 +74,7 @@ APlayerCharacter::APlayerCharacter()
 
 	SetupStimulusSource();
 
-	Health = 100.0f;
+	MaxHealth = 100.0f;
 	
 }
 
@@ -114,6 +115,18 @@ void APlayerCharacter::BeginPlay()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NO GUN CLASS"));
+	}
+
+	CurrentHealth = MaxHealth;
+	
+	if (HealthBarWidgetClass)
+	{
+		HealthBarWidget = CreateWidget<UWidget_HealthBar>(GetWorld()->GetFirstPlayerController(), HealthBarWidgetClass);
+		if (HealthBarWidget)
+		{
+			HealthBarWidget->AddToViewport();
+			HealthBarWidget->UpdateHealthBar(CurrentHealth, MaxHealth); // Initialize with starting health
+		}
 	}
 }
 
@@ -288,8 +301,14 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::SetHealth(float DamageTaken)
 {
-	Health -= DamageTaken;
-	if (Health <= 0 && !GameOverWidget)  // Ensure it triggers only once
+	CurrentHealth -= DamageTaken;
+	
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->UpdateHealthBar(CurrentHealth, MaxHealth);
+	}
+	
+	if (CurrentHealth <= 0 && !GameOverWidget)  // Ensure it triggers only once
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());
 		if (PlayerController && !GameOverWidget)
@@ -313,5 +332,5 @@ void APlayerCharacter::SetHealth(float DamageTaken)
 		}
 		UE_LOG(LogTemp, Error, TEXT("ENTERED FIRST IF"));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
+	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
 }
