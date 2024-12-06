@@ -82,13 +82,18 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	APlayerController* PlayerController = Cast<APlayerController>(GetController()); 
 	
+	APlayerController* PlayerController = Cast<APlayerController>(GetController()); 
 	if (PlayerController)
 	{
 		PlayerController->bShowMouseCursor = true;
 		PlayerController->bEnableClickEvents = true;
-	} //enable cursor view
+		
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock); // Allows free mouse movement
+		InputMode.SetHideCursorDuringCapture(false); // Cursor stays visible
+		PlayerController->SetInputMode(InputMode);
+	} //enables cursor view
 
 	if (PlayerCamera)
 	{
@@ -101,7 +106,8 @@ void APlayerCharacter::BeginPlay()
 		SpawnParams.Owner = this; //the player is the owner of the weapon
 		SpawnParams.Instigator = GetInstigator();
 		
-		EquippedGun = GetWorld()->SpawnActor<APlayerGun>(PlayerGunClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		EquippedGun = GetWorld()->SpawnActor<APlayerGun>(PlayerGunClass, FVector::ZeroVector,
+			FRotator::ZeroRotator, SpawnParams);
 		if (EquippedGun)
 		{
 			EquippedGun->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
@@ -155,6 +161,8 @@ void APlayerCharacter::FireWeapon()
 	{
 		EquippedGun->StartFiring();
 	}
+
+	Turn(); //This is needed since, if not present, the mouse gets locked in the fire position when the function is called
 }
 
 void APlayerCharacter::StopWeapon()
@@ -165,26 +173,6 @@ void APlayerCharacter::StopWeapon()
 	}
 }
 
-void APlayerCharacter::HealthCheck()
-{
-	/*if (Health <= 0)
-	{
-		// Pause the game and show the Game Over screen
-		UGameplayStatics::SetGamePaused(GetWorld(), true);
-
-		// Create and show the Game Over widget
-		if (GameOverWidgetClass)
-		{
-			UUserWidget* GameOverWidget = CreateWidget<UUserWidget>(GetWorld(), GameOverWidgetClass);
-			if (GameOverWidget)
-			{
-				GameOverWidget->AddToViewport();
-			}
-		}
-	}*/
-}
-
-
 void APlayerCharacter::Turn()
 {
 
@@ -193,7 +181,8 @@ void APlayerCharacter::Turn()
 
 	// the right method of getting cursor location!!! note: i used the exact same method in the Epic Top Down Blueprint.
 	FHitResult HitResult;
-	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true,HitResult);
+	GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility),
+		true,HitResult);
 	FVector HitLoc = HitResult.Location;
 
 	//geting the original rotation of the acter;

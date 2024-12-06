@@ -25,7 +25,7 @@ void UWidget_GameOver::NativeConstruct()
 void UWidget_GameOver::RestartGame()
 {
 	// Unpause the game and restart the level
-	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()));  // Reload the current level
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), false);  // Reload the current level
 
 	// Optionally, unpause the game (if it was paused)
 	UGameplayStatics::SetGamePaused(GetWorld(), false);

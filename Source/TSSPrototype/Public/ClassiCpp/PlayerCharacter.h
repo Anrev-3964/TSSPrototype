@@ -29,7 +29,6 @@ private:
 	void MoveRight(float Value);
 	void FireWeapon();
 	void StopWeapon();
-	void HealthCheck();
 	
 	float InterpolateRotation(float CurrentAngle, float TargetAngle, float Speed, float DeltaTime);
 	

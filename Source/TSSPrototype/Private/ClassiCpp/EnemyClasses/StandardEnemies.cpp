@@ -37,9 +37,14 @@ AStandardEnemies::AStandardEnemies()
 	GetMesh()->SetSimulatePhysics(false);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	Speed = 500.0f;
+	Speed = 650.0f;
 	Health = 100.0f;
 	DamageDealt = 10.0f;
+
+	RandomTargetOffset = FVector::ZeroVector;
+	ChangeTargetTime = 0.0f;
+	OscillationPhase = FMath::FRandRange(0.0f, 2.0f * PI); // Randomize initial phase
+
 
 }
 
@@ -124,13 +129,57 @@ void AStandardEnemies::FollowPlayer()
 	if (Player)
 	{
 		FVector PlayerLocation = Player->GetCapsuleComponent()->GetComponentLocation();
-		FVector EnemyLocation = GetActorLocation();
-		FVector Direction = (PlayerLocation - EnemyLocation).GetSafeNormal();
+	    FVector EnemyLocation = GetActorLocation();
 
-		FVector MovementDelta = Direction * Speed * GetWorld()->DeltaTimeSeconds;
+	    // Calculate base direction towards the player
+	    FVector DirectionToPlayer = (PlayerLocation - EnemyLocation).GetSafeNormal();
 
-		// Move the actor, respecting collision
-		AddActorWorldOffset(MovementDelta, true);
+	    // Add orbital movement
+	    FVector PerpendicularDirection = FVector(-DirectionToPlayer.Y, DirectionToPlayer.X, 0.0f); // Perpendicular in 2D
+	    float OrbitStrength = 0.5f; // Blend factor: 0.0 = direct, 1.0 = full orbit
+
+	    // Add randomness to the target position near the player
+	    if (ChangeTargetTime <= 0.0f)
+	    {
+	        float RandomRadius = 50.0f; // Maximum distance from player
+	        RandomTargetOffset = FVector(
+	            FMath::FRandRange(-RandomRadius, RandomRadius),
+	            FMath::FRandRange(-RandomRadius, RandomRadius),
+	            0.0f); // No vertical offset for top-down game
+	        ChangeTargetTime = FMath::FRandRange(1.0f, 2.0f); // Change interval
+	    }
+	    else
+	    {
+	        ChangeTargetTime -= GetWorld()->DeltaTimeSeconds;
+	    }
+
+	    // Random target point around the player
+	    FVector TargetLocation = PlayerLocation + RandomTargetOffset;
+
+	    // Direction towards the random target
+	    FVector DirectionToTarget = (TargetLocation - EnemyLocation).GetSafeNormal();
+
+	    // Blend between direct movement and orbital movement
+	    FVector BlendedDirection = (1.0f - OrbitStrength) * DirectionToPlayer + OrbitStrength * PerpendicularDirection;
+
+	    // Add sine wave oscillation for erratic behavior
+	    float Time = GetWorld()->GetTimeSeconds();
+	    float SineOffsetStrength = 200.0f;
+	    FVector SineOffset = FVector(
+	        FMath::Sin(Time * 2.0f + OscillationPhase) * SineOffsetStrength,
+	        FMath::Cos(Time * 2.0f + OscillationPhase) * SineOffsetStrength,
+	        0.0f);
+
+	    // Final direction combining all effects
+	    FVector FinalDirection = DirectionToTarget + BlendedDirection + SineOffset.GetSafeNormal();
+	    FinalDirection = FinalDirection.GetSafeNormal();
+
+	    // Movement delta
+	    FVector MovementDelta = FinalDirection * Speed * GetWorld()->DeltaTimeSeconds;
+
+	    // Move the actor, respecting collision
+	    AddActorWorldOffset(MovementDelta, true);
+
 	}
 	else
 	{

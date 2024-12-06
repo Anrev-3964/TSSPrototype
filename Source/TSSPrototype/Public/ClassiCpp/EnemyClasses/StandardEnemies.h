@@ -26,6 +26,10 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta=(AllowPrivateAccess = "true"))
 	APlayerCharacter* Player;
+
+	FVector RandomTargetOffset;
+	float ChangeTargetTime;
+	float OscillationPhase; // Unique phase offset for sine wave
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float Speed;
