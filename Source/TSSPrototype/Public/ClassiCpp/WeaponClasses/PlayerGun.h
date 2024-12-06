@@ -23,6 +23,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	float TempFireRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float FireRate;
 	bool bHasFired;
 
@@ -43,7 +45,7 @@ public:
 	USceneComponent* MuzzleLocation;
 	
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float SpreadShotRange;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Bullets", meta = (AllowPrivateAccess = "true"))

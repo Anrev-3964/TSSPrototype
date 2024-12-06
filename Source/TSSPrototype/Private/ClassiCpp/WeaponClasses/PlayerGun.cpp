@@ -27,6 +27,8 @@ APlayerGun::APlayerGun()
 void APlayerGun::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TempFireRate = FireRate;
 }
 
 void APlayerGun::Fire()
@@ -96,26 +98,27 @@ void APlayerGun::StartFiring()
 		bHasFired = true;
 	} //to fix
 	
-	BulletType = BulletClass->GetDefaultObject<ABulletTypeStandard>();
-	if (BulletType)
-	{
-		float TempFireRate = FireRate;
-		switch (BulletType->GetDamageType())
+	//BulletType = BulletClass->GetDefaultObject<ABulletTypeStandard>();
+	//if (BulletType)
+	//{
+		
+		switch (BulletDamageType)
 		{
 		case EDamageType::STANDARD:
 			{
+				TempFireRate = FireRate;
 				GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 			}
 			break;
 		case EDamageType::COLD:
 			{
-				TempFireRate /= 2;
+				TempFireRate = FireRate / 2;
 				GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 			}
 			break;
 		case EDamageType::FIRE:
 			{
-				TempFireRate *= 2;
+				TempFireRate = FireRate * 2;
 				GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 			}
 			break;
@@ -124,12 +127,12 @@ void APlayerGun::StartFiring()
 					UE_LOG(LogTemp, Warning, TEXT("UNKNOWN DAMAGE TYPE"));
 				}
 		}
-	}
-	else
+	//}
+	/*else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NULLPTR FOR BULLET"));
 		GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, FireRate, true);
-	}
+	}*/
 }
 
 void APlayerGun::StopFiring()
@@ -142,6 +145,7 @@ void APlayerGun::StopFiring()
 void APlayerGun::SetBulletElement(EDamageType NewDamageType)
 {
 	BulletDamageType = NewDamageType;
+	StartFiring(); //this makes the Fire Rate change instantly when a new element is taken
 	UE_LOG(LogTemp, Error, TEXT("FUNCTION ACTIVE"));
 	
 }

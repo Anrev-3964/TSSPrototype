@@ -37,7 +37,7 @@ AStandardEnemies::AStandardEnemies()
 	GetMesh()->SetSimulatePhysics(false);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	Speed = 650.0f;
+	Speed = 600.0f;
 	Health = 100.0f;
 	DamageDealt = 10.0f;
 
