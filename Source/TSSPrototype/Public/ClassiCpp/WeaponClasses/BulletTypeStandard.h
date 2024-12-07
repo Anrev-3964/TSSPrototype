@@ -14,15 +14,15 @@ UCLASS()
 class TSSPROTOTYPE_API ABulletTypeStandard : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ABulletTypeStandard();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Mesh;
@@ -31,25 +31,24 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", meta = (AllowPrivateAccess = "true"))
 	TArray<UMaterialInterface*> Materials;
 
-	
+
 	void BulletElement(AActor* Bullet);
-	
+
 	UPROPERTY(EditAnywhere, Category = "Properties", meta = (AllowPrivateAccess = "true"))
 	float Damage;
 	UPROPERTY(EditAnywhere, Category = "Properties", meta = (AllowPrivateAccess = "true"))
 	float Speed;
-	UPROPERTY(EditAnywhere, Category = "Properties", meta = (AllowPrivateAccess = "true"))
-	float FireRate;
-	
+
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-public:	
+	                    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties")
-	EDamageType DamageType {EDamageType::STANDARD};
-	
+	EDamageType DamageType{EDamageType::STANDARD};
+
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	float GetSpeed() const;
 	UFUNCTION(BlueprintCallable, Category = "Properties")
@@ -62,10 +61,6 @@ public:
 	void SetDamage(float NewDamage);
 	UFUNCTION(BlueprintCallable, Category = "Properties")
 	void SetDamageType(EDamageType NewDamageType);
-	
+
 	void SetVelocity(const FVector& Velocity);
-	
 };
-
-
-

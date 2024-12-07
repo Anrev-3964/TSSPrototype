@@ -9,11 +9,14 @@
 // Sets default values
 ABulletTypeStandard::ABulletTypeStandard()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("BulletMesh");
-	if (!Mesh) return;
+	if (!Mesh)
+	{
+		return;
+	}
 	RootComponent = Mesh;
 
 	if (Mesh)
@@ -29,9 +32,12 @@ ABulletTypeStandard::ABulletTypeStandard()
 		Mesh->IgnoreActorWhenMoving(this, true); //This is done so the bullets don't get stuck on each other
 		Mesh->OnComponentBeginOverlap.AddDynamic(this, &ABulletTypeStandard::OnOverlapBegin);
 	}
-	
+
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	if (!ProjectileMovement) return;
+	if (!ProjectileMovement)
+	{
+		return;
+	}
 	Speed = ProjectileMovement->InitialSpeed = 2000.0f;
 	ProjectileMovement->MaxSpeed = Speed;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
@@ -39,21 +45,18 @@ ABulletTypeStandard::ABulletTypeStandard()
 	ProjectileMovement->bShouldBounce = false;
 
 	Damage = 20.0f;
-	FireRate = 0.3f;
 }
 
 // Called when the game starts or when spawned
 void ABulletTypeStandard::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ABulletTypeStandard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ABulletTypeStandard::BulletElement(AActor* Bullet)
@@ -62,17 +65,16 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 	{
 	case EDamageType::STANDARD:
 		Tags.Add(FName("Standard"));
-		if (Materials.Num() > 0 && Materials[0])  // Check if the array has materials
+		if (Materials.Num() > 0 && Materials[0]) // Check if the array has materials
 		{
-			Mesh->SetMaterial(0, Materials[0]);  // Apply material to slot 0
+			Mesh->SetMaterial(0, Materials[0]); // Apply material to slot 0
 		}
 		break;
 	case EDamageType::COLD:
 		{
 			Tags.Add(FName("Cold"));
-			float ColdDamage = Damage/2;
-			float ColdSpeed = Speed*3;
-			float ColdFireRate = FireRate*2;
+			float ColdDamage = Damage / 2;
+			float ColdSpeed = Speed * 3;
 			if (Materials.Num() > 0 && Materials[1])
 			{
 				Mesh->SetMaterial(0, Materials[1]);
@@ -85,9 +87,8 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 	case EDamageType::FIRE:
 		{
 			Tags.Add(FName("Fire"));
-			float FireDamage = Damage*3;
-			float FireSpeed = Speed/2;
-			float FireFireRate = FireRate/2;
+			float FireDamage = Damage * 3;
+			float FireSpeed = Speed / 2;
 			if (Materials.Num() > 0 && Materials[2])
 			{
 				Mesh->SetMaterial(0, Materials[2]);
@@ -119,7 +120,7 @@ EDamageType ABulletTypeStandard::GetDamageType() const
 
 void ABulletTypeStandard::SetDamage(float NewDamage)
 {
-	if (NewDamage >=0)
+	if (NewDamage >= 0)
 	{
 		Damage = NewDamage;
 	}
@@ -127,7 +128,7 @@ void ABulletTypeStandard::SetDamage(float NewDamage)
 
 void ABulletTypeStandard::SetSpeed(float NewSpeed)
 {
-	if (NewSpeed >=0)
+	if (NewSpeed >= 0)
 	{
 		Speed = NewSpeed;
 	}
@@ -148,7 +149,8 @@ void ABulletTypeStandard::SetVelocity(const FVector& Velocity)
 }
 
 void ABulletTypeStandard::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                         const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this)
 	{

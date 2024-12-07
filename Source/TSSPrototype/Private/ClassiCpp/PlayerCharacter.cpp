@@ -5,7 +5,6 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
-#include "ClassiCpp/EnemyClasses/Pickup.h"
 #include "ClassiCpp/EnemyClasses/StandardEnemies.h"
 #include "ClassiCpp/UI/Widget_GameOver.h"
 #include "ClassiCpp/UI/Widget_HealthBar.h"
@@ -41,7 +40,6 @@ APlayerCharacter::APlayerCharacter()
 		CapsuleComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
 		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 		CapsuleComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-		CapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnCapsuleBeginOverlap);
 	}
 	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
@@ -219,36 +217,6 @@ void APlayerCharacter::SetupStimulusSource()
 	}
 }
 
-void APlayerCharacter::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	/*UE_LOG(LogTemp, Log, TEXT("OnCapsuleBeginOverlap called"));
-
-	if (OtherActor && OtherActor != this)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Overlapping actor: %s"), *OtherActor->GetName());
-
-		if (OtherActor->IsA(APickup::StaticClass()))
-		{
-			UE_LOG(LogTemp, Error, TEXT("COLLISION"));
-
-			APickup* PickupFound = Cast<APickup>(OtherActor);
-			if (PickupFound)
-			{
-				UE_LOG(LogTemp, Log, TEXT("Pickup found with element: %d"), static_cast<int32>(PickupFound->Element));
-				EDamageType FoundDamageType = PickupFound->Element;
-				EquippedGun->SetBulletElement(FoundDamageType);
-				PickupFound->Destroy();
-			}
-		}
-	}*/
-}
-
-void APlayerCharacter::OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-}
-
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
@@ -276,11 +244,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 }
-
-/*APlayerGun APlayerCharacter::GetGun()
-{
-	return EquippedGun;
-}*/
 
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
