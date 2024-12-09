@@ -2,7 +2,6 @@
 
 
 #include "ClassiCpp/EnemyClasses/StandardEnemies.h"
-
 #include "ClassiCpp/PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
 
@@ -206,7 +205,6 @@ void AStandardEnemies::DropPickup()
 			FRotator SpawnRotation = FRotator::ZeroRotator;
 
 			GetWorld()->SpawnActor<AActor>(SelectedDrop, SpawnLocation, SpawnRotation);
-			//spawns the drop at the enemy location
 			UE_LOG(LogTemp, Log, TEXT("Dropped item: %s"), *SelectedDrop->GetName());
 		} //drop logic
 	}

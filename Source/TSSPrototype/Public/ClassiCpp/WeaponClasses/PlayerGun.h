@@ -17,7 +17,7 @@ class TSSPROTOTYPE_API APlayerGun : public AActor
 public:
 	// Sets default values for this pawn's properties
 	APlayerGun();
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,12 +26,13 @@ private:
 	float TempFireRate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float FireRate;
-	bool bCanFire;
+	bool bCanFire = true;
+	float ElapsedTime;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Fire();
 
@@ -44,19 +45,19 @@ public:
 	UStaticMeshComponent* MeshComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* MuzzleLocation;
-	
-	
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float SpreadShotRange;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Bullets", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ABulletTypeStandard> BulletClass;
 	UPROPERTY(EditAnywhere, Category = "Bullets")
 	ABulletTypeStandard* BulletType;
 	UPROPERTY(EditAnywhere, Category = "Bullets")
 	EDamageType BulletDamageType;
-	
-	
+
+
 	FTimerHandle FireTimer;
 	FTimerHandle OpenFireTimer;
 };

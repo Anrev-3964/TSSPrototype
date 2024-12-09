@@ -29,9 +29,7 @@ private:
 	void MoveRight(float Value);
 	void FireWeapon();
 	void StopWeapon();
-	
-	float InterpolateRotation(float CurrentAngle, float TargetAngle, float Speed, float DeltaTime);
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* PlayerCharacterSkeletalMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -41,25 +39,19 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Bullet Class")
 	ABulletTypeStandard* BulletTypeStandard;
-	
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float MaxHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float CurrentHealth;
-	
-
-	class UAIPerceptionStimuliSourceComponent* StimulusSource;
-
-	void SetupStimulusSource();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidget_GameOver* GameOverWidget;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidget_HealthBar* HealthBarWidget;
 
-
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -70,7 +62,7 @@ public:
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
-	
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void SetHealth(float DamageTaken);

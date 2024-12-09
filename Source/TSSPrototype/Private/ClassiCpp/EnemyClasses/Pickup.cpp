@@ -8,10 +8,13 @@
 // Sets default values
 APickup::APickup()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	if (!Mesh) return;
+	if (!Mesh)
+	{
+		return;
+	}
 	RootComponent = Mesh;
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Mesh->SetCollisionObjectType(ECC_GameTraceChannel3);
@@ -25,7 +28,7 @@ void APickup::BeginPlay()
 {
 	Super::BeginPlay();
 	Index = FMath::RandRange(0, Materials.Num() - 1);
-	switch (Index)
+	switch (Index) //This sets up the pickup element on spawning, so it can immediately change material
 	{
 	case 0:
 		Element = EDamageType::FIRE;
@@ -46,7 +49,8 @@ void APickup::PickupElement(AActor* Pickup)
 {
 	if (!Mesh || Materials.Num() <= Index || !Materials[Index])
 	{
-		UE_LOG(LogTemp, Error, TEXT("Material not valid or out of range: Index=%d, Materials.Num()=%d"), Index, Materials.Num());
+		UE_LOG(LogTemp, Error, TEXT("Material not valid or out of range: Index=%d, Materials.Num()=%d"), Index,
+		       Materials.Num());
 		return;
 	}
 
@@ -65,11 +69,11 @@ void APickup::PickupElement(AActor* Pickup)
 void APickup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void APickup::OnPickupOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                              const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this)
 	{
@@ -81,5 +85,3 @@ void APickup::OnPickupOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 		}
 	}
 }
-
-

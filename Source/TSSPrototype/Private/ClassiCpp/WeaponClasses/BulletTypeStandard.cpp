@@ -95,7 +95,6 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 			}
 			SetDamage(FireDamage);
 			SetSpeed(FireSpeed);
-			//SetFireRate(FireFireRate);
 		}
 		break;
 	default:
