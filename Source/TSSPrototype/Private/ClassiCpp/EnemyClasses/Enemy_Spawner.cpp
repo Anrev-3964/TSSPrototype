@@ -55,7 +55,7 @@ void AEnemy_Spawner::SpawnLogic()
 		SpawnParameters.Owner = this;
 		SpawnParameters.Instigator = GetInstigator();
 		if (SpawnCount > 0)
-		//if the SpawnCount has a number different from 0 it gets used to choose how many enemies to spawn,
+		//If the SpawnCount has a number different from 0 it gets used to choose how many enemies to spawn,
 		//otherwise only a single enemy gets spawned
 		{
 			for (int i = 0; i < SpawnCount; i++)

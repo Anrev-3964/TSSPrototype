@@ -66,7 +66,6 @@ void APlayerGun::Fire()
 		DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
 	}
 
-
 	FRotator Rotator = GetActorRotation();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
@@ -153,7 +152,7 @@ void APlayerGun::SetBulletElement(EDamageType NewDamageType)
 		StopFiring();
 		StartFiring();
 	}
-	//this makes the Fire Rate change instantly when a new element is taken
+	//This makes the Fire Rate change instantly when a new element is taken
 	UE_LOG(LogTemp, Error, TEXT("FUNCTION ACTIVE"));
 }
 
@@ -163,4 +162,5 @@ void APlayerGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	ElapsedTime += DeltaTime;
+	//This is used to ensure that the cooldown is respected and the player doesn't spam. Not optimal, but works more or less
 }

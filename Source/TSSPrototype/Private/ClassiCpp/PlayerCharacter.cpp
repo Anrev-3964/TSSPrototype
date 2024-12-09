@@ -7,7 +7,7 @@
 #include "ClassiCpp/EnemyClasses/StandardEnemies.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Components/CapsuleComponent.h" //without this I can't use the capsule
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -18,7 +18,7 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = true;
 
-	//this root component is used so my camera doesn't rotate with the capsule while pointing at the cursor
+	//This root component is used so my camera doesn't rotate with the capsule while pointing at the cursor
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent->Mobility = EComponentMobility::Movable;
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
@@ -55,16 +55,6 @@ APlayerCharacter::APlayerCharacter()
 		PlayerCharacterSkeletalMesh->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
 	}
 
-	//Set a default skeletal mesh
-	else if (PlayerCharacterSkeletalMesh == nullptr)
-	{
-		static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(
-			TEXT("SkeletalMesh/Game/Models/SkeletalMeshes/PlayerCharacter/SK_PlayerCharacter"));
-		if (MeshAsset.Succeeded())
-		{
-			PlayerCharacterSkeletalMesh->SetSkeletalMesh(MeshAsset.Object);
-		}
-	}
 	MaxHealth = 100.0f;
 	CurrentHealth = MaxHealth;
 }
@@ -84,7 +74,7 @@ void APlayerCharacter::BeginPlay()
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock); // Allows free mouse movement
 		InputMode.SetHideCursorDuringCapture(false); // Cursor stays visible
 		PlayerController->SetInputMode(InputMode);
-	} //enables cursor view
+	} //Enables cursor view
 
 	if (PlayerCamera)
 	{

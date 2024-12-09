@@ -58,7 +58,7 @@ void APickup::PickupElement(AActor* Pickup)
 	{
 	case EDamageType::COLD:
 	case EDamageType::FIRE:
-		Mesh->SetMaterial(0, Materials[Index]);
+		Mesh->SetMaterial(0, Materials[Index]); //Sets the mesh material equivalent to the index number
 		break;
 	default:
 		break;

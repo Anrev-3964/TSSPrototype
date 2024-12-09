@@ -21,25 +21,22 @@ void UWidget_GameOver::NativeConstruct()
 		QuitButton->OnClicked.AddDynamic(this, &UWidget_GameOver::QuitGame);
 	}
 }
+
 // Called when the "Restart" button is clicked
 void UWidget_GameOver::RestartGame()
 {
-	// Unpause the game and restart the level
-	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), false);  // Reload the current level
-
-	// Optionally, unpause the game (if it was paused)
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), false); // Reload the current level
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
 // Called when the "Quit" button is clicked
 void UWidget_GameOver::QuitGame()
 {
-	// Quit the game
 	UWorld* World = GetWorld();
+
 	APlayerController* PlayerController = World ? World->GetFirstPlayerController() : nullptr;
-	
 	if (PlayerController)
 	{
-		UKismetSystemLibrary::QuitGame(World, PlayerController, EQuitPreference::Quit, false);
+		UKismetSystemLibrary::QuitGame(World, PlayerController, EQuitPreference::Quit, false); // Quit the game
 	}
 }

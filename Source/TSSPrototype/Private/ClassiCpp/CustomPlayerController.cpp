@@ -21,6 +21,7 @@ void ACustomPlayerController::BeginPlay()
 		{
 			float CurrentHealth = PlayerCharacter->GetHealth();
 			float MaxHealth = PlayerCharacter->GetMaxHealth();
+			//Gets both the max value for Health and the temporary value, in order to calculate the bar's filling percentage
 
 			HealthBarWidget = CreateWidget<UWidget_HealthBar>(this, HealthBarWidgetClass);
 			if (HealthBarWidget)
@@ -48,6 +49,7 @@ void ACustomPlayerController::UIManager()
 }
 
 void ACustomPlayerController::UIHealth(float CurrentHealth, float MaxHealth)
+//Used to manage the HealthBar UI and the GameOver UI here, instead of putting it in the PlayerCharacter
 {
 	if (HealthBarWidget)
 	{
@@ -58,7 +60,7 @@ void ACustomPlayerController::UIHealth(float CurrentHealth, float MaxHealth)
 		UE_LOG(LogTemp, Error, TEXT("COULD NOT CREATE HEALTH BAR"));
 	}
 
-	if (CurrentHealth <= 0 && !GameOverWidget) // Ensure it triggers only once
+	if (CurrentHealth <= 0 && !GameOverWidget) // Ensure the GameOver is triggered only once
 	{
 		if (!GameOverWidget)
 		{

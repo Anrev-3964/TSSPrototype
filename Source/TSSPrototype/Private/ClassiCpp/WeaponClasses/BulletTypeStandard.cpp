@@ -27,7 +27,7 @@ ABulletTypeStandard::ABulletTypeStandard()
 		Mesh->SetCollisionObjectType(ECC_GameTraceChannel1);
 		Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 		Mesh->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
-		Mesh->SetGenerateOverlapEvents(true); //all this block of code ensures that the mesh doesn't respond to gravity,
+		Mesh->SetGenerateOverlapEvents(true); //All this block of code ensures that the mesh doesn't respond to gravity,
 		//doesn't have physics and an active collider and that acts as a trigger when overlapping a pawn
 		Mesh->IgnoreActorWhenMoving(this, true); //This is done so the bullets don't get stuck on each other
 		Mesh->OnComponentBeginOverlap.AddDynamic(this, &ABulletTypeStandard::OnOverlapBegin);

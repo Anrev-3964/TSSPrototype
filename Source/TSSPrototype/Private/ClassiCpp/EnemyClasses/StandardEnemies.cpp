@@ -54,6 +54,23 @@ void AStandardEnemies::BeginPlay()
 	Super::BeginPlay();
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	Player = Cast<APlayerCharacter>(PlayerController->GetCharacter());
+
+	Index = FMath::RandRange(0, Materials.Num() - 1);
+	switch (Index) //This sets up the enemy element on spawning, so it can immediately change material
+	{
+	case 0:
+		Element = EDamageType::FIRE;
+		Tags.Add(FName("Fire"));
+		break;
+	case 1:
+		Element = EDamageType::COLD;
+		Tags.Add(FName("Cold"));
+		break;
+	default:
+		Element = EDamageType::STANDARD; // Default or fallback value
+		break;
+	}
+	ChangeMaterialElement(this);
 }
 
 // Called every frame
@@ -74,7 +91,7 @@ void AStandardEnemies::SetHealth(float DamageTaken)
 	if (DamageTaken)
 	{
 		Health -= DamageTaken;
-		UE_LOG(LogTemp, Display, TEXT("New Health: %f"), Health);
+		UE_LOG(LogTemp, Warning, TEXT("New Health: %f"), Health);
 	}
 }
 
@@ -84,11 +101,16 @@ void AStandardEnemies::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp
 {
 	if (OtherActor && OtherActor != this) // Ensure it doesn't overlap itself
 	{
-		if (OtherActor->IsA(ABulletTypeStandard::StaticClass()))
+		if (OtherActor->IsA(ABulletTypeStandard::StaticClass())) //If bullet, the enemy takes damage
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Enemy collided with: %s"), *OtherActor->GetName());
 			ABulletTypeStandard* Bullet = Cast<ABulletTypeStandard>(OtherActor);
 			float DamageTaken = Bullet->GetDamage();
+			EDamageType BulletType = Bullet->GetDamageType();
+			if (BulletType == Element)
+			{
+				DamageTaken *= 2;
+			} //If the bullet element == the enemy element, the bullet damage is doubled
 			SetHealth(DamageTaken);
 		}
 	}
@@ -192,25 +214,45 @@ void AStandardEnemies::FollowPlayer()
 void AStandardEnemies::DropPickup()
 {
 	float DropChance = 25.0f;
-	float DropValue = FMath::RandRange(0.0f, 100.0f); //simulating a percentage of dropping an item
+	float DropValue = FMath::RandRange(0.0f, 100.0f); //Simulating a percentage of dropping an item
 
 	if (DropChance >= DropValue)
 	{
 		if (Drops.Num() > 0)
 		{
 			int32 RandomIndex = FMath::RandRange(0, Drops.Num() - 1);
-			TSubclassOf<AActor> SelectedDrop = Drops[RandomIndex];
+			TSubclassOf<AActor> SelectedDrop = Drops[RandomIndex]; //The drop is chosen randomly from an array
 
 			FVector SpawnLocation = GetActorLocation();
 			FRotator SpawnRotation = FRotator::ZeroRotator;
 
 			GetWorld()->SpawnActor<AActor>(SelectedDrop, SpawnLocation, SpawnRotation);
 			UE_LOG(LogTemp, Log, TEXT("Dropped item: %s"), *SelectedDrop->GetName());
-		} //drop logic
+		} //Drop logic
 	}
 }
 
 void AStandardEnemies::EnableDamage()
 {
 	bCanDealDamage = true;
+}
+
+void AStandardEnemies::ChangeMaterialElement(AStandardEnemies* Enemy)
+{
+	if (!GetMesh() || Materials.Num() <= Index || !Materials[Index])
+	{
+		UE_LOG(LogTemp, Error, TEXT("Material not valid or out of range: Index=%d, Materials.Num()=%d"), Index,
+		       Materials.Num());
+		return;
+	}
+
+	switch (Element)
+	{
+	case EDamageType::COLD:
+	case EDamageType::FIRE:
+		GetMesh()->SetMaterial(1, Materials[Index]);
+		break;
+	default:
+		break;
+	}
 }

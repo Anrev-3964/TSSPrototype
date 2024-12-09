@@ -12,8 +12,8 @@ UCLASS()
 class TSSPROTOTYPE_API AStandardEnemies : public ACharacter
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AStandardEnemies();
 
@@ -21,16 +21,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
-
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta=(AllowPrivateAccess = "true"))
 	APlayerCharacter* Player;
 
 	FVector RandomTargetOffset;
 	float ChangeTargetTime;
-	float OscillationPhase; // Unique phase offset for sine wave
-	
+	float OscillationPhase;
+	int Index;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float Speed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
@@ -39,31 +38,37 @@ private:
 	float DamageDealt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drops", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<AActor>> Drops;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Elements", meta = (AllowPrivateAccess = "true"))
+	TArray<UMaterialInterface*> Materials;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Elements", meta = (AllowPrivateAccess = "true"))
+	EDamageType Element{EDamageType::STANDARD};
 
 	UFUNCTION()
 	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	                           const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnCapsuleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	           UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	bool bCanDealDamage = true;  // Flag to track if damage can be applied
+	bool bCanDealDamage = true; // Flag to track if damage can be applied
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float DamageCooldown = 2.0f; // Time in seconds between damage applications
-	
+
 	void FollowPlayer();
 	void DropPickup();
 	void EnableDamage();
+	void ChangeMaterialElement(AStandardEnemies* Enemy);
 
 	FTimerHandle DamageCooldownTimerHandle;
-	
-public:	
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void SetHealth(float DamageTaken);
-	
 };
