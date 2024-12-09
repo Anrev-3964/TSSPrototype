@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "UI/Widget_GameOver.h"
 #include "UI/Widget_HealthBar.h"
+#include "UI/Widget_Win.h"
 #include "CustomPlayerController.generated.h"
 
 /**
@@ -28,11 +29,16 @@ protected:
 	UWidget_GameOver* GameOverWidget;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	UWidget_HealthBar* HealthBarWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	UWidget_Win* WinWidget;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> WinWidgetClass;
 	void UIHealth(float CurrentHealth, float MaxHealth);
+	void UIWin(bool WinCondition);
 };

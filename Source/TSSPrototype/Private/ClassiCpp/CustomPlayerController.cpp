@@ -84,3 +84,20 @@ void ACustomPlayerController::UIHealth(float CurrentHealth, float MaxHealth)
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
 }
+
+void ACustomPlayerController::UIWin(bool WinCondition)
+{
+	if (WinCondition && !WinWidget) //Ensure it's called only once
+	{
+		WinWidget = CreateWidget<UWidget_Win>(this, WinWidgetClass);
+		if (WinWidget)
+		{
+			WinWidget->AddToViewport();
+
+			UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+			this->bShowMouseCursor = true;
+			this->SetInputMode(FInputModeUIOnly());
+		}
+	}
+}

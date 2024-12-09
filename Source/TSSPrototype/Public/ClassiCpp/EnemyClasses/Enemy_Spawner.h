@@ -13,8 +13,8 @@ UCLASS()
 class TSSPROTOTYPE_API AEnemy_Spawner : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AEnemy_Spawner();
 
@@ -26,7 +26,9 @@ protected:
 	void SpawnLogic();
 	UFUNCTION()
 	void AttachToPlayer();
-	
+
+	void CountEnemies();
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Instance", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<ACharacter>> EnemyToSpawn;
@@ -49,8 +51,8 @@ private:
 
 	FTimerHandle SpawnTimer;
 	FTimerHandle SpawnDelayTimer;
-public:	
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };

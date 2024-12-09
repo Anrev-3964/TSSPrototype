@@ -4,7 +4,9 @@
 #include "ClassiCpp/EnemyClasses/Enemy_Spawner.h"
 
 #include "Camera/CameraComponent.h"
+#include "ClassiCpp/CustomPlayerController.h"
 #include "ClassiCpp/PlayerCharacter.h"
+#include "ClassiCpp/EnemyClasses/StandardEnemies.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -13,10 +15,10 @@ AEnemy_Spawner::AEnemy_Spawner()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	SpawnRate = 10.0f; //How often the enemies spawn
+	SpawnRate = 15.0f; //How often the enemies spawn
 	SpawnCount = 10; //Number of enemies spawning together at once
 	SpawnedEnemies = 0;
-	MaxEnemies = 100;
+	MaxEnemies = 50;
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +45,8 @@ void AEnemy_Spawner::SpawnLogic()
 {
 	if (SpawnedEnemies >= MaxEnemies)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Spawned Enemies: %d"), SpawnedEnemies);
+		UE_LOG(LogTemp, Error, TEXT("Max Spawned Enemies: %d"), MaxEnemies);
 		GetWorldTimerManager().ClearTimer(SpawnTimer);
 		return;
 	}
@@ -112,6 +116,22 @@ void AEnemy_Spawner::AttachToPlayer()
 	}
 }
 
+void AEnemy_Spawner::CountEnemies() //This class summons the Win condition
+{
+	TArray<AActor*> EnemiesInGame;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStandardEnemies::StaticClass(), EnemiesInGame);
+	if (EnemiesInGame.Num() == 0 && !GetWorld()->GetTimerManager().IsTimerActive(SpawnTimer))
+	//If I use something other than the timer the spawner breaks
+	{
+		bool WinCondition = true;
+		ACustomPlayerController* PlayerController = Cast<ACustomPlayerController>(PlayerCharacter->GetController());
+		if (PlayerController)
+		{
+			PlayerController->UIWin(WinCondition);
+		}
+	}
+}
+
 FVector AEnemy_Spawner::GetPositionOutsideCamera()
 {
 	if (!PlayerCharacter)
@@ -149,4 +169,5 @@ FVector AEnemy_Spawner::GetPositionOutsideCamera()
 void AEnemy_Spawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	CountEnemies(); //If the enemies number drops to zero, the game is won
 }
