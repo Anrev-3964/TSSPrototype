@@ -101,7 +101,7 @@ void APlayerGun::StartFiring()
 	case EDamageType::STANDARD:
 		{
 			TempFireRate = FireRate;
-			if (bCanFire && ElapsedTime > TempFireRate)
+			if (bCanFire && ElapsedTime > TempFireRate) //if the bool is true and the cooldown expired, then fire
 			{
 				Fire();
 			}
@@ -138,7 +138,6 @@ void APlayerGun::StartFiring()
 void APlayerGun::StopFiring()
 {
 	GetWorldTimerManager().ClearTimer(FireTimer);
-	//GetWorldTimerManager().ClearTimer(OpenFireTimer);
 	if (ElapsedTime > TempFireRate)
 	{
 		bCanFire = true;

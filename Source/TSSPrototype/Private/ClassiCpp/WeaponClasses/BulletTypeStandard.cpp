@@ -45,12 +45,20 @@ ABulletTypeStandard::ABulletTypeStandard()
 	ProjectileMovement->bShouldBounce = false;
 
 	Damage = 20.0f;
+	BulletLifetime = 5.0f;
 }
 
 // Called when the game starts or when spawned
 void ABulletTypeStandard::BeginPlay()
 {
 	Super::BeginPlay();
+	GetWorldTimerManager().SetTimer(BulletEraserTimer, this, &ABulletTypeStandard::BulletEraser, BulletLifetime, false);
+}
+
+void ABulletTypeStandard::BulletEraser()
+{
+	GetWorldTimerManager().ClearTimer(BulletEraserTimer);
+	this->Destroy(); //This function destroys the bullet after the specified lifetime
 }
 
 // Called every frame
@@ -81,7 +89,6 @@ void ABulletTypeStandard::BulletElement(AActor* Bullet)
 			}
 			SetDamage(ColdDamage);
 			SetSpeed(ColdSpeed);
-			//SetFireRate(ColdFireRate);
 		}
 		break;
 	case EDamageType::FIRE:
@@ -166,7 +173,7 @@ void ABulletTypeStandard::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 		if (OtherActor->IsA(AStandardEnemies::StaticClass()))
 		{
 			UE_LOG(LogTemp, Log, TEXT("Bullet overlapped with: %s"), *OtherActor->GetName());
-			Destroy(); // Destroy or handle overlap appropriately
+			this->Destroy(); // Destroy on overlap
 		}
 	}
 }

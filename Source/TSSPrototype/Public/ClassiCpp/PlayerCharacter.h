@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
-#include "ClassiCpp/UI/Widget_GameOver.h"
-#include "UI/Widget_HealthBar.h"
 #include "PlayerCharacter.generated.h"
 
 
@@ -46,11 +44,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats", meta = (AllowPrivateAccess = "true"))
 	float CurrentHealth;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	UWidget_GameOver* GameOverWidget;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	UWidget_HealthBar* HealthBarWidget;
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -58,12 +51,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TSubclassOf<APlayerGun> PlayerGunClass;
 	APlayerGun* EquippedGun;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> GameOverWidgetClass;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	float GetHealth();
+	float GetMaxHealth();
 	void SetHealth(float DamageTaken);
 };

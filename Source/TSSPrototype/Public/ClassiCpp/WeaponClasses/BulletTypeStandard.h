@@ -43,6 +43,11 @@ private:
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	FTimerHandle BulletEraserTimer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Properties", meta = (AllowPrivateAccess = "true"))
+	float BulletLifetime;
+	void BulletEraser();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

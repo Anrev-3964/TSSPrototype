@@ -2,20 +2,15 @@
 
 
 #include "ClassiCpp/PlayerCharacter.h"
-
-#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
+#include "ClassiCpp/CustomPlayerController.h"
 #include "ClassiCpp/EnemyClasses/StandardEnemies.h"
-#include "ClassiCpp/UI/Widget_GameOver.h"
-#include "ClassiCpp/UI/Widget_HealthBar.h"
 #include "ClassiCpp/WeaponClasses/PlayerGun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h" //without this I can't use the capsule
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Perception/AIPerceptionStimuliSourceComponent.h"
-#include "Perception/AISense_Sight.h"
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -71,6 +66,7 @@ APlayerCharacter::APlayerCharacter()
 		}
 	}
 	MaxHealth = 100.0f;
+	CurrentHealth = MaxHealth;
 }
 
 // Called when the game starts or when spawned
@@ -78,7 +74,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	ACustomPlayerController* PlayerController = Cast<ACustomPlayerController>(GetController());
 	if (PlayerController)
 	{
 		PlayerController->bShowMouseCursor = true;
@@ -117,18 +113,6 @@ void APlayerCharacter::BeginPlay()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NO GUN CLASS"));
-	}
-
-	CurrentHealth = MaxHealth;
-
-	if (HealthBarWidgetClass)
-	{
-		HealthBarWidget = CreateWidget<UWidget_HealthBar>(GetWorld()->GetFirstPlayerController(), HealthBarWidgetClass);
-		if (HealthBarWidget)
-		{
-			HealthBarWidget->AddToViewport();
-			HealthBarWidget->UpdateHealthBar(CurrentHealth, MaxHealth); // Initialize with starting health
-		}
 	}
 }
 
@@ -237,39 +221,19 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopWeapon);
 }
 
+float APlayerCharacter::GetHealth()
+{
+	return CurrentHealth;
+}
+
+float APlayerCharacter::GetMaxHealth()
+{
+	return MaxHealth;
+}
+
 void APlayerCharacter::SetHealth(float DamageTaken)
 {
 	CurrentHealth -= DamageTaken;
-
-	if (HealthBarWidget)
-	{
-		HealthBarWidget->UpdateHealthBar(CurrentHealth, MaxHealth);
-	}
-
-	if (CurrentHealth <= 0 && !GameOverWidget) // Ensure it triggers only once
-	{
-		APlayerController* PlayerController = Cast<APlayerController>(GetController());
-		if (PlayerController && !GameOverWidget)
-		{
-			// Create and add the widget to the viewport
-			GameOverWidget = CreateWidget<UWidget_GameOver>(PlayerController, GameOverWidgetClass);
-			if (GameOverWidget)
-			{
-				GameOverWidget->AddToViewport();
-
-				// Pause the game
-				UGameplayStatics::SetGamePaused(GetWorld(), true);
-
-				// Show mouse cursor for the widget
-				PlayerController->bShowMouseCursor = true;
-				PlayerController->SetInputMode(FInputModeUIOnly());
-				UE_LOG(LogTemp, Error, TEXT("ENTERED THIRD IF"));
-			}
-			UE_LOG(LogTemp, Error, TEXT("ENTERED SECOND IF"));
-		}
-		UE_LOG(LogTemp, Error, TEXT("ENTERED FIRST IF"));
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
-
-	//move UI logic to the player controller
+	ACustomPlayerController* PlayerController = Cast<ACustomPlayerController>(GetController());
+	PlayerController->UIHealth(CurrentHealth, MaxHealth);
 }
