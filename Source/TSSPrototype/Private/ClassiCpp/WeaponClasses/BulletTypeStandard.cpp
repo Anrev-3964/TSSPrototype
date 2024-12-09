@@ -130,6 +130,12 @@ void ABulletTypeStandard::SetSpeed(float NewSpeed)
 	if (NewSpeed >= 0)
 	{
 		Speed = NewSpeed;
+
+		// Update the current velocity to reflect the new speed
+		if (ProjectileMovement)
+		{
+			ProjectileMovement->Velocity = ProjectileMovement->Velocity.GetSafeNormal() * Speed;
+		}
 	}
 }
 
@@ -143,7 +149,11 @@ void ABulletTypeStandard::SetVelocity(const FVector& Velocity)
 {
 	if (ProjectileMovement)
 	{
-		ProjectileMovement->Velocity = Velocity * Speed;
+		FVector NormalizedVelocity = Velocity.GetSafeNormal();
+		ProjectileMovement->Velocity = NormalizedVelocity * Speed;
+
+		// Debug log
+		UE_LOG(LogTemp, Warning, TEXT("Bullet Velocity: %s"), *ProjectileMovement->Velocity.ToString());
 	}
 }
 

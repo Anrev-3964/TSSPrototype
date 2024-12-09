@@ -100,34 +100,31 @@ void APlayerGun::StartFiring()
 	{
 	case EDamageType::STANDARD:
 		{
-			if (bCanFire)
+			TempFireRate = FireRate;
+			if (bCanFire && ElapsedTime > TempFireRate)
 			{
 				Fire();
-				bCanFire = false;
 			}
-			TempFireRate = FireRate;
 			GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 		}
 		break;
 	case EDamageType::COLD:
 		{
-			if (bCanFire)
+			TempFireRate = FireRate / 2;
+			if (bCanFire && ElapsedTime > TempFireRate)
 			{
 				Fire();
-				bCanFire = false;
 			}
-			TempFireRate = FireRate / 2;
 			GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 		}
 		break;
 	case EDamageType::FIRE:
 		{
-			if (bCanFire)
+			TempFireRate = FireRate * 2;
+			if (bCanFire && ElapsedTime > TempFireRate)
 			{
 				Fire();
-				bCanFire = false;
 			}
-			TempFireRate = FireRate * 2;
 			GetWorldTimerManager().SetTimer(FireTimer, this, &APlayerGun::Fire, TempFireRate, true);
 		}
 		break;
@@ -136,14 +133,12 @@ void APlayerGun::StartFiring()
 			UE_LOG(LogTemp, Warning, TEXT("UNKNOWN DAMAGE TYPE"));
 		}
 	}
-
-	// Fire the first bullet immediately if allowed
 }
 
 void APlayerGun::StopFiring()
 {
 	GetWorldTimerManager().ClearTimer(FireTimer);
-	GetWorldTimerManager().ClearTimer(OpenFireTimer);
+	//GetWorldTimerManager().ClearTimer(OpenFireTimer);
 	if (ElapsedTime > TempFireRate)
 	{
 		bCanFire = true;
@@ -154,8 +149,12 @@ void APlayerGun::StopFiring()
 void APlayerGun::SetBulletElement(EDamageType NewDamageType)
 {
 	BulletDamageType = NewDamageType;
-	StopFiring();
-	StartFiring(); //this makes the Fire Rate change instantly when a new element is taken
+	if (GetWorldTimerManager().IsTimerActive(FireTimer))
+	{
+		StopFiring();
+		StartFiring();
+	}
+	//this makes the Fire Rate change instantly when a new element is taken
 	UE_LOG(LogTemp, Error, TEXT("FUNCTION ACTIVE"));
 }
 
